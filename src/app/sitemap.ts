@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { SITE } from "@/lib/site";
-import { getPublishedPosts } from "@/lib/blog-repository";
+import { getSitemapPosts } from "@/lib/blog-repository";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
@@ -42,10 +42,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Rotas dinâmicas do Blog (carregadas em tempo real do banco de dados)
   let blogRoutes: MetadataRoute.Sitemap = [];
   try {
-    const posts = await getPublishedPosts();
+    const posts = await getSitemapPosts();
     blogRoutes = posts.map((post) => ({
       url: `${SITE.url}/blog/${post.slug}`,
-      lastModified: post.published_at ? new Date(post.published_at) : now,
+      lastModified: post.updated_at ? new Date(post.updated_at) : (post.published_at ? new Date(post.published_at) : now),
       changeFrequency: "weekly",
       priority: 0.7,
     }));

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { query, run, queryOne } from "@/lib/db";
+import { query, queryOne } from "@/lib/db";
+import { parsePostInput } from "@/lib/blog-post-input";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
   let paramIndex = 1;
 
   if (search) {
-    whereClause += ` AND (title ILIKE $${paramIndex} OR excerpt ILIKE $${paramIndex})`;
+    whereClause += ` AND (title ILIKE $${paramIndex} OR excerpt ILIKE $${paramIndex} OR slug ILIKE $${paramIndex})`;
     params.push(`%${search}%`);
     paramIndex++;
   }
@@ -46,20 +47,45 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { title, slug, content, excerpt, status = "draft", published_at, ai_generated = false } = body;
-
-    if (!title || !slug) {
-      return NextResponse.json({ error: "Título e slug são obrigatórios" }, { status: 400 });
+    const body = (await request.json()) as Record<string, unknown>;
+    const parsed = await parsePostInput(body);
+    if (!parsed.ok) {
+      return NextResponse.json(
+        { error: parsed.error, field: parsed.field },
+        { status: 400 }
+      );
     }
 
+    const v = parsed.values;
     const result = await query<{ id: string }>(
-      `INSERT INTO posts (id, title, slug, content, excerpt, status, published_at, ai_generated)
-       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-      [title, slug, content || null, excerpt || null, status, published_at || null, ai_generated]
+      `INSERT INTO posts (
+         id, title, slug, content, excerpt, status, published_at, ai_generated,
+         cover_image, seo_title, meta_description, agent, cta_enabled,
+         scheduled_timezone, updated_at
+       )
+       VALUES (
+         gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7,
+         $8, $9, $10, $11, $12, $13, NOW()
+       )
+       RETURNING id`,
+      [
+        v.title,
+        v.slug,
+        v.content,
+        v.excerpt,
+        v.status,
+        v.published_at,
+        v.ai_generated,
+        v.cover_image,
+        v.seo_title,
+        v.meta_description,
+        v.agent,
+        v.cta_enabled,
+        v.scheduled_timezone,
+      ]
     );
 
-    return NextResponse.json({ id: result[0].id }, { status: 201 });
+    return NextResponse.json({ id: result[0].id, slug: v.slug }, { status: 201 });
   } catch (error) {
     console.error("Error creating post:", error);
     return NextResponse.json({ error: "Erro ao criar artigo" }, { status: 500 });

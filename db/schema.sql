@@ -115,16 +115,36 @@ CREATE TABLE posts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text NOT NULL,
   slug text UNIQUE NOT NULL,
-  content text,
+  content text,                            -- HTML do editor rico (markdown legado é convertido)
   excerpt text,
-  status text DEFAULT 'draft', -- draft | published | scheduled
-  published_at timestamptz,
+  status text DEFAULT 'draft',             -- draft | published | scheduled
+  published_at timestamptz,                -- UTC; usado também como data do agendamento
   ai_generated boolean DEFAULT false,
-  created_at timestamptz DEFAULT now()
+  cover_image text,
+  seo_title text,
+  meta_description text,
+  agent text NOT NULL DEFAULT 'blog_writer', -- blog_writer | seo_specialist | case_study_writer
+  cta_enabled boolean NOT NULL DEFAULT true,
+  scheduled_timezone text NOT NULL DEFAULT 'America/Sao_Paulo',
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX posts_status_idx ON posts (status);
 CREATE INDEX posts_slug_idx ON posts (slug);
 CREATE INDEX posts_published_at_idx ON posts (published_at);
+CREATE INDEX posts_updated_at_idx ON posts (updated_at);
+
+-- Fallback de mídia (Neon Object Storage indisponível em algumas regiões)
+CREATE TABLE media_assets (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  object_key text UNIQUE NOT NULL,
+  filename text NOT NULL,
+  content_type text NOT NULL,
+  size_bytes integer NOT NULL,
+  data bytea NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX media_assets_created_at_idx ON media_assets (created_at);
 
 -- Agenda (groundwork para Google Meet futuro)
 CREATE TABLE appointments (
