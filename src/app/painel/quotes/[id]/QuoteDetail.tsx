@@ -86,7 +86,7 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
       const quoteData = await quoteRes.json();
       const itemsData = await itemsRes.json();
       const eventsData = await eventsRes.json();
-      const clientsData = await clientsRes.json();
+      const clientsData = (await clientsRes.json()) as any;
 
       setQuote({
         ...quoteData,
