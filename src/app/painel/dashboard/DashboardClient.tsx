@@ -1,8 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardMetrics } from "@/app/painel/dashboard/components/MetricsCards";
 import OpportunitiesPanel from "@/app/painel/dashboard/components/OpportunitiesPanel";
+import {
+  RecentLeadsList,
+  RecentQuotesList,
+} from "@/app/painel/dashboard/components/RecentLists";
+import type { RecentLead, RecentQuote } from "@/lib/dashboard-repository";
 import Link from "next/link";
 import {
   UserPlus,
@@ -41,9 +47,16 @@ interface DashboardClientProps {
     totalClients: number;
     totalRevenue: number;
   };
+  recentLeads: RecentLead[];
+  recentQuotes: RecentQuote[];
 }
 
-export default function DashboardClient({ metrics }: DashboardClientProps) {
+export default function DashboardClient({
+  metrics,
+  recentLeads,
+  recentQuotes,
+}: DashboardClientProps) {
+  const router = useRouter();
   const [showNewClientModal, setShowNewClientModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -109,8 +122,8 @@ export default function DashboardClient({ metrics }: DashboardClientProps) {
         intent: "conhecer",
         tagIds: [],
       });
-      // Recarregar a página para atualizar métricas
-      window.location.reload();
+      // Atualiza os dados do Server Component sem recarregar a página inteira
+      router.refresh();
     } catch (err) {
       setError("Erro ao criar cliente");
       setLoading(false);
@@ -143,8 +156,8 @@ export default function DashboardClient({ metrics }: DashboardClientProps) {
               color: "var(--ok)",
             }}
           >
-            <RefreshCw className="w-3 h-3 animate-spin" />
-            Dados sincronizados
+            <RefreshCw className="w-3 h-3" />
+            Dados atualizados
           </span>
           <button onClick={handleOpenModal} className="painel-btn pr">
             <UserPlus className="w-4 h-4" />
@@ -255,12 +268,12 @@ export default function DashboardClient({ metrics }: DashboardClientProps) {
 
         {/* Recent Leads */}
         <div className="painel-c painel-span-4">
-          <RecentLeads />
+          <RecentLeadsList leads={recentLeads} />
         </div>
 
         {/* Recent Quotes */}
         <div className="painel-c painel-span-4">
-          <RecentQuotes />
+          <RecentQuotesList quotes={recentQuotes} />
         </div>
       </div>
 
@@ -420,165 +433,4 @@ export default function DashboardClient({ metrics }: DashboardClientProps) {
       )}
     </div>
   );
-}
-
-interface ClientFormData {
-  name: string;
-  email: string;
-  phone: string;
-  company: string;
-  source: string;
-  intent: string;
-  tagIds: string[];
-}
-
-interface Tag {
-  id: string;
-  name: string;
-  color: string;
-}
-
-interface DashboardClientProps {
-  metrics: {
-    leadsToday: number;
-    pendingQuotes: number;
-    sentProposals: number;
-    conversionRate: number;
-    totalClients: number;
-    totalRevenue: number;
-  };
-}
-
-// Server Components para dados
-async function RecentLeads() {
-  const { getRecentLeads } = await import("@/lib/dashboard-repository");
-  const leads = await getRecentLeads(5);
-
-  return (
-    <div>
-      <div className="painel-ch">
-        <span className="font-semibold text-sm">Leads Recentes</span>
-        <Link
-          href="/painel/clients"
-          className="more hover:underline"
-          style={{ color: "var(--p)" }}
-        >
-          Ver todos
-        </Link>
-      </div>
-
-      {leads.length === 0 ? (
-        <p className="text-xs text-center py-10" style={{ color: "var(--mu)" }}>
-          Nenhum lead cadastrado ainda.
-        </p>
-      ) : (
-        <ul className="space-y-2">
-          {leads.map((lead) => (
-            <li
-              key={lead.id}
-              className="flex items-center justify-between p-2.5 rounded-lg border"
-              style={{ borderColor: "var(--bd)", background: "var(--side)" }}
-            >
-              <div className="min-w-0 pr-2">
-                <p className="text-xs font-semibold truncate" style={{ color: "var(--tx)" }}>
-                  {lead.name}
-                </p>
-                <p className="text-[11px] truncate" style={{ color: "var(--mu)" }}>
-                  {lead.email}
-                </p>
-              </div>
-              <span className={`painel-pill ${getSourcePillClass(lead.source)} flex-shrink-0`}>
-                {getSourceLabel(lead.source)}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-async function RecentQuotes() {
-  const { getRecentQuotes } = await import("@/lib/dashboard-repository");
-  const quotes = await getRecentQuotes(5);
-
-  return (
-    <div>
-      <div className="painel-ch">
-        <span className="font-semibold text-sm">Orçamentos Recentes</span>
-        <Link
-          href="/painel/quotes"
-          className="more hover:underline"
-          style={{ color: "var(--p)" }}
-        >
-          Ver todos
-        </Link>
-      </div>
-
-      {quotes.length === 0 ? (
-        <p className="text-xs text-center py-10" style={{ color: "var(--mu)" }}>
-          Nenhum orçamento emitido.
-        </p>
-      ) : (
-        <ul className="space-y-2">
-          {quotes.map((quote) => (
-            <li
-              key={quote.id}
-              className="flex items-center justify-between p-2.5 rounded-lg border"
-              style={{ borderColor: "var(--bd)", background: "var(--side)" }}
-            >
-              <div className="min-w-0 pr-2">
-                <p className="text-xs font-semibold truncate" style={{ color: "var(--tx)" }}>
-                  {quote.code}
-                </p>
-                <p className="text-[11px] truncate" style={{ color: "var(--mu)" }}>
-                  {quote.clientName}
-                </p>
-              </div>
-              <span className={`painel-pill ${getStatusPillClass(quote.status)} flex-shrink-0`}>
-                {getStatusLabel(quote.status)}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-function getSourcePillClass(source: string) {
-  switch (source) {
-    case "site": return "up";
-    case "manual": return "";
-    default: return "";
-  }
-}
-
-function getSourceLabel(source: string) {
-  switch (source) {
-    case "site": return "Site";
-    case "manual": return "Manual";
-    default: return source;
-  }
-}
-
-function getStatusPillClass(status: string) {
-  switch (status) {
-    case "aprovado": return "up";
-    case "recusado": return "dn";
-    case "proposta_enviada": return "up";
-    default: return "";
-  }
-}
-
-function getStatusLabel(status: string) {
-  switch (status) {
-    case "novo": return "Novo";
-    case "em_analise": return "Em Análise";
-    case "proposta_enviada": return "Proposta";
-    case "aprovado": return "Aprovado";
-    case "recusado": return "Recusado";
-    case "expirado": return "Expirado";
-    default: return status;
-  }
 }

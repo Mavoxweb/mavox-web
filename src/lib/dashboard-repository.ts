@@ -9,41 +9,35 @@ export interface DashboardMetrics {
   totalRevenue: number;
 }
 
-export async function getDashboardMetrics(): Promise<DashboardMetrics> {
-  const [
-    leadsTodayResult,
-    pendingQuotesResult,
-    sentProposalsResult,
-    approvedQuotesResult,
-    totalClientsResult,
-    totalRevenueResult,
-  ] = await Promise.all([
-    query<{ count: string }>(
-      `SELECT COUNT(*) as count FROM leads WHERE DATE(created_at) = CURRENT_DATE`
-    ),
-    query<{ count: string }>(
-      `SELECT COUNT(*) as count FROM quotes WHERE status IN ('novo', 'em_analise')`
-    ),
-    query<{ count: string }>(
-      `SELECT COUNT(*) as count FROM quotes WHERE status = 'proposta_enviada'`
-    ),
-    query<{ count: string }>(
-      `SELECT COUNT(*) as count FROM quotes WHERE status = 'aprovado'`
-    ),
-    query<{ count: string }>(
-      `SELECT COUNT(*) as count FROM clients`
-    ),
-    query<{ total: string }>(
-      `SELECT COALESCE(SUM(total), 0) as total FROM quotes WHERE status = 'aprovado'`
-    ),
-  ]);
+interface MetricsRow {
+  leadsToday: number;
+  pendingQuotes: number;
+  sentProposals: number;
+  approvedQuotes: number;
+  totalClients: number;
+  totalRevenue: number;
+}
 
-  const leadsToday = parseInt(leadsTodayResult[0]?.count ?? "0");
-  const pendingQuotes = parseInt(pendingQuotesResult[0]?.count ?? "0");
-  const sentProposals = parseInt(sentProposalsResult[0]?.count ?? "0");
-  const approvedQuotes = parseInt(approvedQuotesResult[0]?.count ?? "0");
-  const totalClients = parseInt(totalClientsResult[0]?.count ?? "0");
-  const totalRevenue = parseFloat(totalRevenueResult[0]?.total ?? "0");
+export async function getDashboardMetrics(): Promise<DashboardMetrics> {
+  // Uma única ida ao banco em vez de seis consultas separadas.
+  const rows = await query<MetricsRow>(`
+    SELECT
+      (SELECT COUNT(*) FROM clients WHERE created_at >= CURRENT_DATE)::int AS "leadsToday",
+      (SELECT COUNT(*) FROM quotes WHERE status IN ('novo', 'em_analise'))::int AS "pendingQuotes",
+      (SELECT COUNT(*) FROM quotes WHERE status = 'proposta_enviada')::int AS "sentProposals",
+      (SELECT COUNT(*) FROM quotes WHERE status = 'aprovado')::int AS "approvedQuotes",
+      (SELECT COUNT(*) FROM clients)::int AS "totalClients",
+      (SELECT COALESCE(SUM(total), 0) FROM quotes WHERE status = 'aprovado')::float8 AS "totalRevenue"
+  `);
+
+  const row = rows[0];
+
+  const leadsToday = row?.leadsToday ?? 0;
+  const pendingQuotes = row?.pendingQuotes ?? 0;
+  const sentProposals = row?.sentProposals ?? 0;
+  const approvedQuotes = row?.approvedQuotes ?? 0;
+  const totalClients = row?.totalClients ?? 0;
+  const totalRevenue = row?.totalRevenue ?? 0;
 
   const totalQuotes = pendingQuotes + sentProposals + approvedQuotes;
   const conversionRate = totalQuotes > 0 ? (approvedQuotes / totalQuotes) * 100 : 0;
@@ -61,14 +55,18 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
 export interface RecentLead {
   id: string;
   name: string;
-  email: string;
-  source: string;
+  email: string | null;
+  phone: string | null;
+  source: string | null;
   createdAt: string;
 }
 
 export async function getRecentLeads(limit = 5): Promise<RecentLead[]> {
   const rows = await query<RecentLead>(
-    `SELECT id, name, email, source, created_at as "createdAt" FROM leads ORDER BY created_at DESC LIMIT $1`,
+    `SELECT id, name, email, phone, source, created_at as "createdAt"
+     FROM clients
+     ORDER BY created_at DESC
+     LIMIT $1`,
     [limit]
   );
   return rows;

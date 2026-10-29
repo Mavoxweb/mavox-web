@@ -1,8 +1,23 @@
-import { getDashboardMetrics } from "@/lib/dashboard-repository";
-import { DashboardMetrics } from "@/app/painel/dashboard/components/MetricsCards";
+import {
+  getDashboardMetrics,
+  getRecentLeads,
+  getRecentQuotes,
+} from "@/lib/dashboard-repository";
 import DashboardClient from "./DashboardClient";
 
 export default async function DashboardPage() {
-  const metrics = await getDashboardMetrics();
-  return <DashboardClient metrics={metrics} />;
+  // Busca tudo em paralelo: 1 query de métricas + 2 listas.
+  const [metrics, recentLeads, recentQuotes] = await Promise.all([
+    getDashboardMetrics(),
+    getRecentLeads(5),
+    getRecentQuotes(5),
+  ]);
+
+  return (
+    <DashboardClient
+      metrics={metrics}
+      recentLeads={recentLeads}
+      recentQuotes={recentQuotes}
+    />
+  );
 }
