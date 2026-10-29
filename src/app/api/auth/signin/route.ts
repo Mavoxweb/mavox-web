@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { run, queryOne } from "@/lib/db";
+import { queryOne } from "@/lib/db";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
