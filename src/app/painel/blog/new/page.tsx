@@ -5,9 +5,17 @@ import { useRouter } from "next/navigation";
 import { Loader2, ArrowLeft, Save, Zap, FileText, Settings as SettingsIcon, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
-interface OpenRouterModel {
+interface OpenRouterModelData {
   id: string;
-  name: string;
+  name?: string;
+}
+
+interface OpenRouterModelsResponse {
+  data: OpenRouterModelData[];
+}
+
+interface OpenRouterGenerateResponse {
+  content: string;
 }
 
 export default function NewPostPage() {
@@ -51,9 +59,9 @@ export default function NewPostPage() {
           const modelsData = await modelsRes.json();
           setModels(
             modelsData.data
-              .filter((m: any) => m.id.includes("openai/") || m.id.includes("anthropic/") || m.id.includes("google/"))
+              .filter((m: OpenRouterModelData) => m.id.includes("openai/") || m.id.includes("anthropic/") || m.id.includes("google/"))
               .slice(0, 20)
-              .map((m: any) => ({
+              .map((m: OpenRouterModelData) => ({
                 id: m.id,
                 name: m.name || m.id,
               }))
@@ -86,7 +94,7 @@ export default function NewPostPage() {
         }),
       });
 
-      const data = await res.json();
+      const data: { content?: string } = await res.json();
 
       if (!res.ok) {
         setError(data.error || "Erro ao gerar texto com IA");
