@@ -57,7 +57,7 @@ export function ClientList() {
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, search, sourceFilter, intentFilter, tagFilter]);
+  }, [pagination.page, pagination.limit, search, sourceFilter, intentFilter, tagFilter]);
 
   const fetchTags = useCallback(async () => {
     try {

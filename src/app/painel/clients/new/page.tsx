@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -17,15 +17,9 @@ export default function NewClientPage() {
   const [tags, setTags] = useState<{ id: string; name: string; color: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchTags = async () => {
-    try {
-      const res = await fetch("/api/painel/tags?limit=50");
-      const data = await res.json();
-      setTags(data.data);
-    } catch (error) {
-      console.error("Erro ao buscar tags:", error);
-    }
-  };
+  useEffect(() => {
+    fetchTags();
+  }, []);
 
   const handleTagChange = (tagId: string) => {
     setTagIds((prev) => (prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]));

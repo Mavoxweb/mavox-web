@@ -46,7 +46,7 @@ export async function PUT(
     const body = await request.json();
     const { status, items, total } = body;
 
-    const oldQuote = await queryOne(`SELECT status FROM quotes WHERE id = $1`, [id]);
+    const oldQuote = await queryOne<{ status: string }>(`SELECT status FROM quotes WHERE id = $1`, [id]);
     if (!oldQuote) {
       return NextResponse.json({ error: "Orçamento não encontrado" }, { status: 404 });
     }
