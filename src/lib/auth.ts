@@ -1,10 +1,5 @@
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
 
-const NEON_AUTH_JWKS_URL = process.env.NEON_AUTH_JWKS_URL!;
-const NEON_AUTH_BASE_URL = process.env.NEON_AUTH_BASE_URL!;
-
-const JWKS = createRemoteJWKSet(new URL(NEON_AUTH_JWKS_URL));
-
 export interface AuthUser extends JWTPayload {
   sub: string;
   email: string;
@@ -13,10 +8,22 @@ export interface AuthUser extends JWTPayload {
   emailVerified?: boolean;
 }
 
+let JWKS: ReturnType<typeof createRemoteJWKSet> | null = null;
+
+function getJWKS() {
+  if (JWKS) return JWKS;
+  const jwksUrl = process.env.NEON_AUTH_JWKS_URL;
+  if (!jwksUrl) {
+    throw new Error("NEON_AUTH_JWKS_URL não está configurada");
+  }
+  JWKS = createRemoteJWKSet(new URL(jwksUrl));
+  return JWKS;
+}
+
 export async function verifyToken(token: string): Promise<AuthUser | null> {
   try {
-    const { payload } = await jwtVerify(token, JWKS, {
-      issuer: NEON_AUTH_BASE_URL,
+    const { payload } = await jwtVerify(token, getJWKS(), {
+      issuer: process.env.NEON_AUTH_BASE_URL,
     });
     return payload as unknown as AuthUser;
   } catch {
@@ -25,9 +32,13 @@ export async function verifyToken(token: string): Promise<AuthUser | null> {
 }
 
 export async function signIn(email: string, password: string): Promise<{ token: string; user: AuthUser } | null> {
-  const res = await fetch(`${NEON_AUTH_BASE_URL}/sign-in/email`, {
+  const baseUrl = process.env.NEON_AUTH_BASE_URL;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!baseUrl) return null;
+
+  const res = await fetch(`${baseUrl}/sign-in/email`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Origin: process.env.NEXT_PUBLIC_SITE_URL! },
+    headers: { "Content-Type": "application/json", Origin: siteUrl || "" },
     body: JSON.stringify({ email, password }),
   });
   if (!res.ok) return null;
@@ -37,9 +48,13 @@ export async function signIn(email: string, password: string): Promise<{ token: 
 }
 
 export async function signUp(email: string, password: string, name: string): Promise<{ token: string; user: AuthUser } | null> {
-  const res = await fetch(`${NEON_AUTH_BASE_URL}/sign-up/email`, {
+  const baseUrl = process.env.NEON_AUTH_BASE_URL;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!baseUrl) return null;
+
+  const res = await fetch(`${baseUrl}/sign-up/email`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Origin: process.env.NEXT_PUBLIC_SITE_URL! },
+    headers: { "Content-Type": "application/json", Origin: siteUrl || "" },
     body: JSON.stringify({ email, password, name }),
   });
   if (!res.ok) return null;
