@@ -1,4 +1,5 @@
 import { posts } from "@/app/blog/mock-posts";
+import Link from "next/link";
 
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = posts.find((p) => p.slug === params.slug);
@@ -8,7 +9,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       <div className="min-h-screen bg-white dark:bg-[#0f172a] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-[#0f172a] dark:text-[#f1f5f9]">Artigo não encontrado</h1>
-          <a href="/blog" className="mt-4 inline-block text-blue-600 dark:text-blue-400 hover:underline">Voltar ao blog</a>
+          <Link href="/blog" className="mt-4 inline-block text-blue-600 dark:text-blue-400 hover:underline">Voltar ao blog</Link>
         </div>
       </div>
     );
@@ -19,9 +20,9 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       <header className="bg-white dark:bg-[#1e293b] border-b border-[#e2e8f0] dark:border-[#334155] py-8 px-6 sm:px-8 lg:px-12">
         <div className="max-w-7xl mx-auto">
           <nav className="mb-6">
-            <a href="/blog" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+            <Link href="/blog" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
               ← Voltar ao blog
-            </a>
+            </Link>
           </nav>
           <div className="flex flex-wrap gap-2 mb-4">
             <span className="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
@@ -36,7 +37,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
               {new Date(post.published_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
             </span>
           </div>
-          <h1 className="text-3xl font-bold text-[#0f172a] dark:text-[#f1f5f9] mb-4 line-clamp-2">{post.title}</h2>
+          <h1 className="text-3xl font-bold text-[#0f172a] dark:text-[#f1f5f9] mb-4 line-clamp-2">{post.title}</h1>
         </div>
       </header>
 

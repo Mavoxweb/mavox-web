@@ -1,8 +1,23 @@
 import { NextResponse } from "next/server";
 
+interface OpenRouterMessage {
+  role: string;
+  content: string;
+}
+
+interface OpenRouterChoice {
+  message: {
+    content: string;
+  };
+}
+
+interface OpenRouterResponse {
+  choices?: OpenRouterChoice[];
+}
+
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body: { trending_topic?: string; mavox_data?: string; objective?: string } = await request.json();
     const { trending_topic, mavox_data, objective } = body;
 
     const openrouterApiKey = process.env.OPENROUTER_API_KEY;

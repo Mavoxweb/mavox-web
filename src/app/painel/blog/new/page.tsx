@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, ArrowLeft, Save, Zap, FileText, Settings as SettingsIcon } from "lucide-react";
+import { Loader2, ArrowLeft, Save, Zap, FileText, Settings as SettingsIcon, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
 interface OpenRouterModel {
