@@ -98,7 +98,7 @@ Escreva apenas o conteúdo do artigo em markdown.`;
       );
     }
 
-    const data = await response.json();
+    const data: OpenRouterResponse = await response.json();
     const generatedContent = data.choices?.[0]?.message?.content || "";
 
     return NextResponse.json({ content: generatedContent });
