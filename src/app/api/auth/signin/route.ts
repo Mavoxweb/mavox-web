@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     }
 
     // Buscar a conta do usuário no Neon Auth
-    const account = await queryOne<{ id: string; userId: string; password: string }>(
+    const account = await queryOne<{ id: string; userId: string; password: string; email: string; role: string; name: string }>(
       `SELECT a.id, a."userId", a.password, u.email, u.role, u.name
        FROM neon_auth.account a
        JOIN neon_auth.user u ON u.id = a."userId"
