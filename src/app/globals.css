@@ -195,8 +195,8 @@ main > section:not(#hero) { content-visibility: auto; contain-intrinsic-size: au
 }
 
 .painel-logo-img {
-  width: 56px;
-  height: 56px;
+  width: 156px;
+  height: auto;
   border-radius: 8px;
   object-fit: contain;
   flex: none;
@@ -234,6 +234,10 @@ main > section:not(#hero) { content-visibility: auto; contain-intrinsic-size: au
 .painel-app.collapsed .painel-aside {
   padding-left: 10px;
   padding-right: 10px;
+}
+
+.painel-app.collapsed .painel-logo-img {
+  width: 52px;
 }
 
 .painel-app.collapsed .painel-user {
@@ -709,6 +713,9 @@ main > section:not(#hero) { content-visibility: auto; contain-intrinsic-size: au
   .painel-app.collapsed .painel-aside {
     padding-left: 14px;
     padding-right: 14px;
+  }
+  .painel-app.collapsed .painel-logo-img {
+    width: 156px;
   }
   .painel-app.collapsed .painel-user {
     justify-content: flex-start;
