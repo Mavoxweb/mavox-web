@@ -176,6 +176,7 @@ export default function NewClientPage() {
                 <option value="conhecer">Conhecer</option>
                 <option value="avaliando">Avaliando</option>
                 <option value="pronto_para_contratar">Pronto para Contratar</option>
+                <option value="prospect">Prospect (prospecção ativa)</option>
               </select>
             </div>
           </div>

@@ -1,118 +1,134 @@
 import { NextResponse } from "next/server";
-import { query, run } from "@/lib/db";
 import * as XLSX from "xlsx";
+import { importLeadBatch } from "@/lib/lead-import-repository";
+import { normalizeImportMeta } from "@/lib/lead-import";
 
-interface ClientInput {
-  name: string;
-  email?: string;
-  phone?: string;
-  company?: string;
-  source?: "manual" | "site";
-  intent?: "conhecer" | "avaliando" | "pronto_para_contratar";
-  tagIds?: string[];
+interface BulkPayload {
+  leads: unknown[];
+  meta: ReturnType<typeof normalizeImportMeta>;
+  origin: string;
 }
 
-async function processClientInTransaction(client: ClientInput): Promise<void> {
-  await query("BEGIN");
-  try {
-    if (client.email) {
-      const existing = await query<{ id: string }>(
-        `SELECT id FROM clients WHERE email = $1 LIMIT 1`,
-        [client.email]
-      );
-      if (existing.length > 0) {
-        const clientId = existing[0].id;
-        await query(
-          `UPDATE clients SET name = $1, phone = $2, company = $3, source = $4, intent = $5 WHERE id = $6`,
-          [client.name, client.phone || null, client.company || null, client.source || "manual", client.intent || "conhecer", clientId]
-        );
-        if (client.tagIds && client.tagIds.length > 0) {
-          await query(`DELETE FROM client_tags WHERE client_id = $1`, [clientId]);
-          for (const tagId of client.tagIds) {
-            await query(
-              `INSERT INTO client_tags (client_id, tag_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-              [clientId, tagId]
-            );
-          }
-        }
-      } else {
-        const result = await query<{ id: string }>(
-          `INSERT INTO clients (id, name, email, phone, company, source, intent) VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6) RETURNING id`,
-          [client.name, client.email || null, client.phone || null, client.company || null, client.source || "manual", client.intent || "conhecer"]
-        );
-        const clientId = result[0].id;
-        if (client.tagIds && client.tagIds.length > 0) {
-          for (const tagId of client.tagIds) {
-            await query(
-              `INSERT INTO client_tags (client_id, tag_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-              [clientId, tagId]
-            );
-          }
-        }
-      }
-    }
-    await query("COMMIT");
-  } catch (error) {
-    await query("ROLLBACK");
-    throw error;
+function looksLikeApifyLeads(leads: unknown[]): boolean {
+  return leads.some((lead) => {
+    if (!lead || typeof lead !== "object") return false;
+    const record = lead as Record<string, unknown>;
+    return (
+      "telefone_e164" in record ||
+      "faixa" in record ||
+      "mensagem_abordagem_sugerida" in record ||
+      "nicho_detalhe" in record
+    );
+  });
+}
+
+/** Aceita { meta, leads }, { data: { meta, leads } }, { data: [...] }, [...]. */
+function extractPayload(body: unknown): BulkPayload {
+  const root =
+    body && typeof body === "object" && !Array.isArray(body) && "data" in body
+      ? (body as Record<string, unknown>).data
+      : body;
+
+  if (Array.isArray(root)) {
+    return {
+      leads: root,
+      meta: null,
+      origin: looksLikeApifyLeads(root) ? "apify" : "manual",
+    };
   }
+
+  if (root && typeof root === "object") {
+    const record = root as Record<string, unknown>;
+    const list = Array.isArray(record.leads)
+      ? record.leads
+      : Array.isArray(record.clients)
+        ? record.clients
+        : [];
+    const meta = normalizeImportMeta(record.meta);
+    return {
+      leads: list,
+      meta,
+      origin: meta ? "apify" : looksLikeApifyLeads(list) ? "apify" : "manual",
+    };
+  }
+
+  return { leads: [], meta: null, origin: "manual" };
 }
 
 export async function POST(request: Request) {
   try {
+    const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
     const contentType = request.headers.get("content-type") || "";
-    let clients: ClientInput[] = [];
+    let payload: BulkPayload;
 
     if (contentType.includes("multipart/form-data")) {
       const formData = await request.formData();
-      const file = formData.get("file") as File;
+      const file = formData.get("file") as File | null;
       if (!file) {
-        return NextResponse.json({ success: 0, errors: ["Nenhum arquivo enviado"] }, { status: 400 });
+        return NextResponse.json(
+          { success: 0, errors: ["Nenhum arquivo enviado"] },
+          { status: 400 }
+        );
       }
       const buffer = await file.arrayBuffer();
       const workbook = XLSX.read(buffer, { type: "array" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-      clients = jsonData.map((row: any) => ({
-        name: row.name || row.Nome || "",
-        email: row.email || row.Email || "",
-        phone: row.phone || row.Telefone || row.WhatsApp || "",
-        company: row.company || row.Empresa || "",
-        source: (row.source || row.Origem || "manual").toLowerCase() === "site" ? "site" : "manual",
-        intent: (row.intent || row.Intencao || "conhecer").toLowerCase() === "pronto_para_contratar" ? "pronto_para_contratar" :
-                (row.intent || row.Intencao || "conhecer").toLowerCase() === "avaliando" ? "avaliando" : "conhecer",
-        tagIds: row.tagIds || row.Tags ? String(row.tagIds || row.Tags).split(";").map((t: string) => t.trim()).filter(Boolean) : [],
-      }));
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
+      payload = {
+        leads: rows.map((row) => ({
+          name: row.name || row.Nome || "",
+          email: row.email || row.Email || "",
+          phone: row.phone || row.Telefone || row.WhatsApp || "",
+          company: row.company || row.Empresa || "",
+          source: String(row.source || row.Origem || "manual").toLowerCase() === "site" ? "site" : "manual",
+          intent:
+            String(row.intent || row.Intencao || "conhecer").toLowerCase() === "pronto_para_contratar"
+              ? "pronto_para_contratar"
+              : String(row.intent || row.Intencao || "conhecer").toLowerCase() === "avaliando"
+                ? "avaliando"
+                : "conhecer",
+          tagIds:
+            row.tagIds || row.Tags
+              ? String(row.tagIds || row.Tags)
+                  .split(";")
+                  .map((tag) => tag.trim())
+                  .filter(Boolean)
+              : [],
+        })),
+        meta: null,
+        origin: "xlsx",
+      };
     } else {
-      const body = await request.json();
-      clients = body.data || [];
-    }
-
-    if (!clients.length) {
-      return NextResponse.json({ success: 0, errors: ["Nenhum cliente válido encontrado"] }, { status: 400 });
-    }
-
-    const errors: string[] = [];
-    let success = 0;
-
-    for (let i = 0; i < clients.length; i++) {
-      const client = clients[i];
-      if (!client.name || !client.name.trim()) {
-        errors.push(`Linha ${i + 1}: Nome é obrigatório`);
-        continue;
-      }
+      let body: unknown;
       try {
-        await processClientInTransaction(client);
-        success++;
-      } catch (err) {
-        errors.push(`Linha ${i + 1} (${client.name}): ${err instanceof Error ? err.message : "Erro desconhecido"}`);
+        body = await request.json();
+      } catch {
+        return NextResponse.json(
+          { success: 0, errors: ["JSON inválido"] },
+          { status: 400 }
+        );
       }
+      payload = extractPayload(body);
     }
 
-    return NextResponse.json({ success, errors });
+    if (payload.leads.length === 0) {
+      return NextResponse.json(
+        { success: 0, errors: ["Nenhum cliente válido encontrado"] },
+        { status: 400 }
+      );
+    }
+
+    const result = await importLeadBatch(payload.leads, payload.meta, {
+      origin: payload.origin,
+      dryRun,
+    });
+
+    return NextResponse.json(result, { status: result.success > 0 || dryRun ? 200 : 422 });
   } catch (error) {
     console.error("Erro na importação em massa:", error);
-    return NextResponse.json({ success: 0, errors: ["Erro interno do servidor"] }, { status: 500 });
+    return NextResponse.json(
+      { success: 0, errors: ["Erro interno do servidor"] },
+      { status: 500 }
+    );
   }
 }

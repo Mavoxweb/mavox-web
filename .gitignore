@@ -4,5 +4,6 @@ node_modules
 next-env.d.ts
 tsconfig.tsbuildinfo
 .neon
+leads_*.json
 
 .vercel

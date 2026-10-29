@@ -261,7 +261,9 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
             {proposal.client.company && (
               <p className="text-[#64748b] text-sm">{proposal.client.company}</p>
             )}
-            <p className="text-sm text-[#64748b] mt-1">{proposal.client.email}</p>
+            {proposal.client.email && (
+              <p className="text-sm text-[#64748b] mt-1">{proposal.client.email}</p>
+            )}
             {proposal.client.phone && (
               <p className="text-sm text-[#64748b]">{proposal.client.phone}</p>
             )}

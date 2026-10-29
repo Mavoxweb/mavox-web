@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { query, queryOne, run } from "@/lib/db";
+import { normalizePhoneE164 } from "@/lib/lead-import";
 
 export async function GET(
   request: Request,
@@ -38,11 +39,31 @@ export async function PUT(
 
   try {
     const body = await request.json();
-    const { name, email, phone, company, source, intent, tagIds } = body;
+    const { name, email, phone, company, source, intent, tagIds, notes } = body;
 
     await run(
-      `UPDATE clients SET name = $1, email = $2, phone = $3, company = $4, source = $5, intent = $6 WHERE id = $7`,
-      [name, email || null, phone || null, company || null, source, intent, id]
+      `UPDATE clients SET
+         name = $1,
+         email = $2,
+         phone = $3,
+         phone_e164 = COALESCE($4, phone_e164),
+         company = $5,
+         source = $6,
+         intent = $7,
+         notes = $8,
+         updated_at = now()
+       WHERE id = $9`,
+      [
+        name,
+        email || null,
+        phone || null,
+        normalizePhoneE164(phone),
+        company || null,
+        source,
+        intent,
+        notes || null,
+        id,
+      ]
     );
 
     if (tagIds) {

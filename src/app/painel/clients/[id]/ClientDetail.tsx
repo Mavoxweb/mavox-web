@@ -8,12 +8,37 @@ import Link from "next/link";
 interface Client {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
   phone: string | null;
+  phone_e164: string | null;
   company: string | null;
   source: string;
   intent: string;
   created_at: string;
+  category: string | null;
+  niche: string | null;
+  tier: string | null;
+  tier_label: string | null;
+  whatsapp_status: string | null;
+  whatsapp_link: string | null;
+  instagram_handle: string | null;
+  instagram_url: string | null;
+  instagram_followers: number | null;
+  website: string | null;
+  website_type: string | null;
+  city: string | null;
+  state: string | null;
+  neighborhood: string | null;
+  activity_estimate: string | null;
+  google_reviews: number | null;
+  google_rating: string | number | null;
+  notes: string | null;
+  approach_message: string | null;
+  sources: string[] | null;
+  objective: string | null;
+  recommended_service: string | null;
+  offer_code: string | null;
+  raw_data: unknown;
   tags: { id: string; name: string; color: string }[];
 }
 
@@ -33,6 +58,7 @@ export function ClientDetail({ clientId }: { clientId: string }) {
   const [error, setError] = useState("");
   const [availableTags, setAvailableTags] = useState<{ id: string; name: string; color: string }[]>([]);
   const [editing, setEditing] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [editData, setEditData] = useState({
     name: "",
     email: "",
@@ -40,6 +66,7 @@ export function ClientDetail({ clientId }: { clientId: string }) {
     company: "",
     source: "",
     intent: "",
+    notes: "",
     tagIds: [] as string[],
   });
 
@@ -68,11 +95,12 @@ export function ClientDetail({ clientId }: { clientId: string }) {
       setAvailableTags(tagsData.data || []);
       setEditData({
         name: clientData.name,
-        email: clientData.email,
+        email: clientData.email || "",
         phone: clientData.phone || "",
         company: clientData.company || "",
         source: clientData.source,
         intent: clientData.intent,
+        notes: clientData.notes || "",
         tagIds: clientData.tags.map((t: { id: string }) => t.id),
       });
     } catch {
@@ -126,6 +154,8 @@ export function ClientDetail({ clientId }: { clientId: string }) {
   const getSourceLabel = (source: string) => {
     switch (source) {
       case "site": return "Site";
+      case "apify": return "Apify";
+      case "xlsx": return "Planilha";
       case "manual": return "Manual";
       default: return source;
     }
@@ -134,6 +164,8 @@ export function ClientDetail({ clientId }: { clientId: string }) {
   const getSourceColor = (source: string) => {
     switch (source) {
       case "site": return "bg-green-100 text-green-800";
+      case "apify": return "bg-violet-100 text-violet-800";
+      case "xlsx": return "bg-purple-100 text-purple-800";
       case "manual": return "bg-blue-100 text-blue-800";
       default: return "bg-gray-100 text-gray-800";
     }
@@ -144,6 +176,7 @@ export function ClientDetail({ clientId }: { clientId: string }) {
       case "conhecer": return "Conhecer";
       case "avaliando": return "Avaliando";
       case "pronto_para_contratar": return "Pronto para Contratar";
+      case "prospect": return "Prospect";
       default: return intent;
     }
   };
@@ -153,6 +186,7 @@ export function ClientDetail({ clientId }: { clientId: string }) {
       case "conhecer": return "bg-gray-100 text-gray-800";
       case "avaliando": return "bg-yellow-100 text-yellow-800";
       case "pronto_para_contratar": return "bg-green-100 text-green-800";
+      case "prospect": return "bg-indigo-100 text-indigo-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
@@ -178,6 +212,38 @@ export function ClientDetail({ clientId }: { clientId: string }) {
       case "recusado": return "bg-red-100 text-red-800";
       case "expirado": return "bg-gray-100 text-gray-800";
       default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getWebsiteLabel = (type: string | null) => {
+    switch (type) {
+      case "nosite": return "Sem site";
+      case "igonly": return "Só Instagram";
+      case "link": return "Só link";
+      case "template": return "Template";
+      case "site_ig": return "Site + Instagram";
+      case "site_noig": return "Site sem Instagram";
+      default: return type || "—";
+    }
+  };
+
+  const getWhatsappLabel = (status: string | null) => {
+    switch (status) {
+      case "confirmado": return "Confirmado";
+      case "provavel": return "Provável";
+      case "nao_identificado": return "Não identificado";
+      default: return "—";
+    }
+  };
+
+  const copyApproachMessage = async () => {
+    if (!client?.approach_message) return;
+    try {
+      await navigator.clipboard.writeText(client.approach_message);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
     }
   };
 
@@ -210,7 +276,24 @@ export function ClientDetail({ clientId }: { clientId: string }) {
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{client.name}</h1>
-            <p className="text-gray-600 mt-1">{client.email}</p>
+            <div className="flex flex-wrap items-center gap-2 mt-1">
+              {client.tier && (
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                  client.tier === "A" ? "bg-sky-100 text-sky-800" : "bg-amber-100 text-amber-800"
+                }`}>
+                  Faixa {client.tier} · {client.tier === "A" ? "Site" : "Recorrente"}
+                </span>
+              )}
+              <p className="text-gray-600">
+                {[client.category, client.niche].filter(Boolean).join(" · ") || "Lead de prospecção"}
+              </p>
+              {client.city && (
+                <p className="text-gray-500 text-sm">
+                  {client.city}{client.state ? `/${client.state}` : ""}
+                  {client.neighborhood ? ` · ${client.neighborhood}` : ""}
+                </p>
+              )}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -226,11 +309,12 @@ export function ClientDetail({ clientId }: { clientId: string }) {
                 onClick={() => {
                   setEditData({
                     name: client.name,
-                    email: client.email,
+                    email: client.email || "",
                     phone: client.phone || "",
                     company: client.company || "",
                     source: client.source,
                     intent: client.intent,
+                    notes: client.notes || "",
                     tagIds: client.tags.map((t: { id: string }) => t.id),
                   });
                   setEditing(false);
@@ -264,6 +348,161 @@ export function ClientDetail({ clientId }: { clientId: string }) {
       {/* Client Info */}
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
+          {/* Enriched lead profile */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Perfil do lead</h2>
+
+            {(client.objective || client.recommended_service) && (
+              <div className="mb-5 rounded-lg border border-blue-100 bg-blue-50 p-4">
+                {client.objective && (
+                  <>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Objetivo</p>
+                    <p className="text-sm text-blue-900 mb-3">{client.objective}</p>
+                  </>
+                )}
+                {client.recommended_service && (
+                  <>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Serviço recomendado</p>
+                    <p className="text-sm font-medium text-blue-900">{client.recommended_service}</p>
+                  </>
+                )}
+              </div>
+            )}
+
+            <dl className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Faixa</dt>
+                <dd className="mt-1 text-gray-900">{client.tier_label || "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Categoria / nicho</dt>
+                <dd className="mt-1 text-gray-900">
+                  {[client.category, client.niche].filter(Boolean).join(" · ") || "—"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Localização</dt>
+                <dd className="mt-1 text-gray-900">
+                  {client.city
+                    ? `${client.city}${client.state ? `/${client.state}` : ""}${client.neighborhood ? ` · ${client.neighborhood}` : ""}`
+                    : "—"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">WhatsApp</dt>
+                <dd className="mt-1 text-gray-900 flex items-center gap-2">
+                  {client.whatsapp_status === "confirmado" ? (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                      Confirmado
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">
+                      {getWhatsappLabel(client.whatsapp_status)}
+                    </span>
+                  )}
+                  {client.phone && <span className="text-sm">{client.phone}</span>}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Instagram</dt>
+                <dd className="mt-1 text-gray-900">
+                  {client.instagram_handle ? (
+                    <a
+                      href={client.instagram_url || `https://www.instagram.com/${client.instagram_handle}/`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700"
+                    >
+                      @{client.instagram_handle}
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  ) : (
+                    <span className="text-gray-500">Não identificado</span>
+                  )}
+                  {client.instagram_followers !== null && (
+                    <span className="text-sm text-gray-500 ml-2">
+                      {client.instagram_followers.toLocaleString("pt-BR")} seguidores
+                    </span>
+                  )}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Site ({getWebsiteLabel(client.website_type)})</dt>
+                <dd className="mt-1 text-gray-900">
+                  {client.website ? (
+                    /^[\w.-]+\.[a-z]{2,}(\/\S*)?$/i.test(client.website.trim()) ? (
+                      <a
+                        href={`https://${client.website.trim().replace(/^https?:\/\//i, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 break-all"
+                      >
+                        {client.website}
+                        <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+                      </a>
+                    ) : (
+                      <span className="text-sm">{client.website}</span>
+                    )
+                  ) : (
+                    <span className="text-gray-500">Não informado</span>
+                  )}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Google</dt>
+                <dd className="mt-1 text-gray-900">
+                  {client.google_reviews !== null ? (
+                    <span>
+                      {client.google_rating ?? "—"} ★ · {client.google_reviews} avaliações
+                    </span>
+                  ) : (
+                    <span className="text-gray-500">—</span>
+                  )}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Tempo de atividade</dt>
+                <dd className="mt-1 text-sm text-gray-900">{client.activity_estimate || "—"}</dd>
+              </div>
+              <div className="sm:col-span-2">
+                <dt className="text-sm font-medium text-gray-500">Observação</dt>
+                <dd className="mt-1 text-sm text-gray-900 whitespace-pre-line">{client.notes || "—"}</dd>
+              </div>
+              {client.sources && client.sources.length > 0 && (
+                <div className="sm:col-span-2">
+                  <dt className="text-sm font-medium text-gray-500">Fontes</dt>
+                  <dd className="mt-1 text-sm text-gray-600">{client.sources.join(" · ")}</dd>
+                </div>
+              )}
+            </dl>
+          </div>
+
+          {/* Approach message */}
+          {client.approach_message && (
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-semibold text-gray-900">Mensagem de abordagem sugerida</h2>
+                <button
+                  onClick={copyApproachMessage}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  {copied ? "Copiado" : "Copiar"}
+                </button>
+              </div>
+              <p className="text-sm text-gray-700 whitespace-pre-line bg-gray-50 rounded-lg p-4">
+                {client.approach_message}
+              </p>
+              <a
+                href={`https://wa.me/${(client.phone_e164 || client.phone || "").replace(/\D/g, "")}?text=${encodeURIComponent(client.approach_message)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+              >
+                Abrir WhatsApp com esta mensagem
+              </a>
+            </div>
+          )}
+
           {/* Basic Info */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Informações</h2>
@@ -350,6 +589,15 @@ export function ClientDetail({ clientId }: { clientId: string }) {
                       </button>
                     ))}
                   </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Observação</label>
+                  <textarea
+                    value={editData.notes}
+                    onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
               </div>
             ) : (
@@ -462,22 +710,28 @@ export function ClientDetail({ clientId }: { clientId: string }) {
                 <Calendar className="w-5 h-5 text-green-600" />
                 <span className="font-medium text-gray-900">Agendar Reunião</span>
               </Link>
-              <a
-                href={`https://wa.me/${client.phone?.replace(/\D/g, "")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
-              >
-                <ExternalLink className="w-5 h-5 text-green-500" />
-                <span className="font-medium text-gray-900">WhatsApp</span>
-              </a>
-              <a
-                href={`mailto:${client.email}`}
-                className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
-              >
-                <Mail className="w-5 h-5 text-blue-600" />
-                <span className="font-medium text-gray-900">E-mail</span>
-              </a>
+              {(client.phone || client.phone_e164) && (
+                <a
+                  href={`https://wa.me/${(client.phone_e164 || client.phone || "").replace(/\D/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+                >
+                  <ExternalLink className="w-5 h-5 text-green-500" />
+                  <span className="font-medium text-gray-900">
+                    WhatsApp{client.whatsapp_status === "confirmado" ? " (confirmado)" : ""}
+                  </span>
+                </a>
+              )}
+              {client.email && (
+                <a
+                  href={`mailto:${client.email}`}
+                  className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+                >
+                  <Mail className="w-5 h-5 text-blue-600" />
+                  <span className="font-medium text-gray-900">E-mail</span>
+                </a>
+              )}
             </div>
           </div>
         </div>

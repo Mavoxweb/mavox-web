@@ -142,7 +142,7 @@ export async function GET(
                   margin: [0, 0, 0, 5],
                 },
                 { text: client.company || "—", fontSize: 12, color: "#475569", margin: [0, 0, 0, 5] },
-                { text: client.email, fontSize: 12, color: "#475569", margin: [0, 0, 0, 5] },
+                { text: client.email || "—", fontSize: 12, color: "#475569", margin: [0, 0, 0, 5] },
                 client.phone && { text: client.phone, fontSize: 12, color: "#475569" },
               ],
             },

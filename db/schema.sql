@@ -235,3 +235,61 @@ CREATE INDEX email_logs_created_idx ON email_logs (created_at DESC);
 CREATE INDEX email_logs_status_idx ON email_logs (status);
 CREATE INDEX ai_opportunities_run_idx ON ai_opportunities (run_date DESC);
 CREATE INDEX ai_opportunities_status_idx ON ai_opportunities (status);
+
+-- ============================================================
+-- Fase 3: enriquecimento de leads (ver db/migrations/003)
+-- ============================================================
+
+CREATE TABLE lead_imports (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title         text,
+  origin        text NOT NULL DEFAULT 'apify',
+  generated_at  date,
+  total         int NOT NULL DEFAULT 0,
+  imported      int NOT NULL DEFAULT 0,
+  updated       int NOT NULL DEFAULT 0,
+  meta          jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at    timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX lead_imports_created_idx ON lead_imports (created_at DESC);
+
+ALTER TABLE clients ADD COLUMN import_id uuid REFERENCES lead_imports(id) ON DELETE SET NULL;
+ALTER TABLE clients ADD COLUMN external_id text;
+ALTER TABLE clients ADD COLUMN category text;
+ALTER TABLE clients ADD COLUMN niche text;
+ALTER TABLE clients ADD COLUMN tier text;
+ALTER TABLE clients ADD COLUMN tier_label text;
+ALTER TABLE clients ADD COLUMN phone_e164 text;
+ALTER TABLE clients ADD COLUMN whatsapp_status text;
+ALTER TABLE clients ADD COLUMN whatsapp_link text;
+ALTER TABLE clients ADD COLUMN instagram_handle text;
+ALTER TABLE clients ADD COLUMN instagram_url text;
+ALTER TABLE clients ADD COLUMN instagram_followers int;
+ALTER TABLE clients ADD COLUMN website text;
+ALTER TABLE clients ADD COLUMN website_type text;
+ALTER TABLE clients ADD COLUMN city text;
+ALTER TABLE clients ADD COLUMN state text;
+ALTER TABLE clients ADD COLUMN neighborhood text;
+ALTER TABLE clients ADD COLUMN activity_estimate text;
+ALTER TABLE clients ADD COLUMN google_reviews int;
+ALTER TABLE clients ADD COLUMN google_rating numeric(2,1);
+ALTER TABLE clients ADD COLUMN notes text;
+ALTER TABLE clients ADD COLUMN approach_message text;
+ALTER TABLE clients ADD COLUMN sources jsonb NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE clients ADD COLUMN objective text;
+ALTER TABLE clients ADD COLUMN recommended_service text;
+ALTER TABLE clients ADD COLUMN offer_code text;
+ALTER TABLE clients ADD COLUMN raw_data jsonb;
+ALTER TABLE clients ADD COLUMN updated_at timestamptz NOT NULL DEFAULT now();
+
+CREATE UNIQUE INDEX clients_import_external_idx ON clients (import_id, external_id)
+  WHERE import_id IS NOT NULL AND external_id IS NOT NULL;
+CREATE UNIQUE INDEX clients_phone_e164_idx ON clients (phone_e164)
+  WHERE phone_e164 IS NOT NULL;
+CREATE INDEX clients_import_idx ON clients (import_id);
+CREATE INDEX clients_category_idx ON clients (category);
+CREATE INDEX clients_tier_idx ON clients (tier);
+CREATE INDEX clients_city_idx ON clients (city);
+CREATE INDEX clients_website_type_idx ON clients (website_type);
+CREATE INDEX clients_offer_code_idx ON clients (offer_code);
+CREATE INDEX clients_name_trgm_idx ON clients (lower(name));

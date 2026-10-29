@@ -5,9 +5,26 @@ import { ClientList } from "./components/ClientList";
 import Link from "next/link";
 import { Upload, Download, X, FileText, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 
+interface ImportPreviewRow {
+  line: number;
+  name: string;
+  tier: string | null;
+  category: string | null;
+  city: string | null;
+  state: string | null;
+  recommendedService: string | null;
+  tags: string[];
+}
+
 interface ImportResult {
   success: number;
+  inserted?: number;
+  updated?: number;
+  skipped?: number;
+  total?: number;
+  dryRun?: boolean;
   errors: string[];
+  preview?: ImportPreviewRow[];
 }
 
 export default function ClientsPage() {
@@ -19,14 +36,13 @@ export default function ClientsPage() {
   const [result, setResult] = useState<ImportResult | null>(null);
   const [templateDownloading, setTemplateDownloading] = useState(false);
 
-  const handleJsonSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitJson = async (dryRun: boolean) => {
     if (!jsonInput.trim()) return;
     setImporting(true);
     setResult(null);
 
     try {
-      const res = await fetch("/api/painel/clients/bulk", {
+      const res = await fetch(`/api/painel/clients/bulk${dryRun ? "?dryRun=1" : ""}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
@@ -34,7 +50,7 @@ export default function ClientsPage() {
       });
       const data = await res.json();
       setResult(data);
-      if (data.success > 0) setJsonInput("");
+      if (!dryRun && (data.inserted || 0) + (data.updated || 0) > 0) setJsonInput("");
     } catch (err) {
       setResult({ success: 0, errors: ["Erro ao importar: " + err] });
     } finally {
@@ -138,31 +154,60 @@ export default function ClientsPage() {
               </button>
             </div>
 
-            {result && (
-              <div className="mb-4 p-4 rounded-lg border" style={{
-                backgroundColor: result.success > 0 ? "rgba(34, 197, 94, 0.1)" : "rgba(239, 68, 68, 0.1)",
-                borderColor: result.success > 0 ? "var(--ok)" : "var(--bad)",
-                color: result.success > 0 ? "var(--ok)" : "var(--bad)"
-              }}>
-                <div className="flex items-center gap-2 mb-2">
-                  {result.success > 0 ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-                  <span className="font-medium">
-                    {result.success > 0 ? `Importados com sucesso: ${result.success}` : "Falha na importação"}
-                  </span>
-                </div>
-                {result.errors.length > 0 && (
-                  <div className="text-sm">
-                    <p className="font-medium mb-1">Erros:</p>
-                    <ul className="list-disc list-inside space-y-1 max-h-32 overflow-y-auto">
-                      {result.errors.slice(0, 10).map((err, i) => (
-                        <li key={i}>{err}</li>
-                      ))}
-                      {result.errors.length > 10 && <li>...e mais {result.errors.length - 10} erros</li>}
-                    </ul>
+            {result && (() => {
+              const ready = result.preview?.length ?? 0;
+              const ok = result.dryRun ? ready > 0 : result.success > 0;
+              return (
+                <div className="mb-4 p-4 rounded-lg border" style={{
+                  backgroundColor: ok ? "rgba(34, 197, 94, 0.1)" : "rgba(239, 68, 68, 0.1)",
+                  borderColor: ok ? "var(--ok)" : "var(--bad)",
+                  color: ok ? "var(--ok)" : "var(--bad)"
+                }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    {ok ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+                    <span className="font-medium">
+                      {result.dryRun
+                        ? `Validação: ${ready} de ${result.total ?? ready} leads prontos`
+                        : ok
+                          ? `Importação concluída: ${result.success} de ${result.total ?? result.success} leads`
+                          : "Nenhum lead importado"}
+                    </span>
                   </div>
-                )}
-              </div>
-            )}
+
+                  <p className="text-sm mb-2">
+                    {result.dryRun
+                      ? "Nada foi gravado. Revise abaixo e confirme a importação."
+                      : `${result.inserted ?? 0} novos · ${result.updated ?? 0} atualizados · ${result.skipped ?? 0} ignorados`}
+                  </p>
+
+                  {result.dryRun && ready > 0 && (
+                    <ul className="text-sm space-y-1 max-h-40 overflow-y-auto mb-2">
+                      {result.preview?.slice(0, 8).map((row) => (
+                        <li key={row.line} className="truncate">
+                          <span className="font-medium">{row.name}</span>
+                          {row.tier ? ` · Faixa ${row.tier}` : ""}
+                          {row.city ? ` · ${row.city}/${row.state ?? ""}` : ""}
+                          {row.recommendedService ? ` · ${row.recommendedService}` : ""}
+                        </li>
+                      ))}
+                      {ready > 8 && <li>...e mais {ready - 8} leads</li>}
+                    </ul>
+                  )}
+
+                  {result.errors.length > 0 && (
+                    <div className="text-sm">
+                      <p className="font-medium mb-1">Ocorrências:</p>
+                      <ul className="list-disc list-inside space-y-1 max-h-32 overflow-y-auto">
+                        {result.errors.slice(0, 10).map((err, i) => (
+                          <li key={i}>{err}</li>
+                        ))}
+                        {result.errors.length > 10 && <li>...e mais {result.errors.length - 10} ocorrências</li>}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             <div className="mb-4">
               <div className="flex gap-2 mb-4">
@@ -189,29 +234,36 @@ export default function ClientsPage() {
               </div>
 
               {importMode === "json" && (
-                <form onSubmit={handleJsonSubmit} className="space-y-4">
+                <form onSubmit={(e) => { e.preventDefault(); submitJson(false); }} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium mb-1" style={{ color: "var(--tx)" }}>
-                      Cole o JSON dos clientes (array de objetos)
+                      Cole o JSON dos leads (array ou {"{ meta, leads }"})
                     </label>
                     <textarea
                       value={jsonInput}
                       onChange={(e) => setJsonInput(e.target.value)}
                       rows={10}
-                      placeholder='[
-  { "name": "João Silva", "email": "joao@email.com", "phone": "(11) 99999-9999", "company": "Empresa A", "source": "manual", "intent": "conhecer", "tagIds": [] },
-  { "name": "Maria Santos", "email": "maria@email.com", "phone": "(21) 88888-8888", "company": "Empresa B", "source": "site", "intent": "avaliando", "tagIds": ["tag-id-1"] }
-]'
+                      placeholder='{ "meta": { "titulo": "Leads Mavox – saúde e estética, RJ" }, "leads": [ { "id": 1, "nome": "Studio Exemplo", "faixa": "A", "telefone_e164": "+5521999999999", "site": { "tipo": "template" } } ] }'
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-mono text-sm"
                       style={{ borderColor: "var(--bd)", background: "var(--side)" }}
                     />
                     <p className="text-xs mt-1" style={{ color: "var(--mu)" }}>
-                      Campos: name (obrigatório), email, phone, company, source (manual|site), intent (conhecer|avaliando|pronto_para_contratar), tagIds (array de IDs de tags)
+                      Aceita o JSON completo do Apify (com meta, faixa, site, Instagram, avaliações, observação e mensagem de abordagem) e também o formato simples
+                      (name, email, phone, company, source, intent, tagIds). Todos os campos originais são preservados.
                     </p>
                   </div>
                   <div className="flex justify-end gap-2">
                     <button type="button" onClick={() => { setShowImportModal(false); setResult(null); }} className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                       Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => submitJson(true)}
+                      disabled={importing || !jsonInput.trim()}
+                      className="px-4 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors flex items-center gap-2"
+                      style={{ borderColor: "var(--bd)", color: "var(--tx)" }}
+                    >
+                      {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : "Validar"}
                     </button>
                     <button type="submit" disabled={importing || !jsonInput.trim()} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center gap-2">
                       {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : "Importar"}
