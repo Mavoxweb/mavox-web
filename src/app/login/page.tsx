@@ -6,7 +6,7 @@ import { Lock, Mail, AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
 import { signIn, getAuthCookieName } from "@/lib/auth";
 import Link from "next/link";
 
-export default function LoginForm() {
+export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams?.get("redirect") || "/painel/dashboard";
