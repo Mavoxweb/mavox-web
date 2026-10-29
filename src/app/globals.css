@@ -181,7 +181,7 @@ main > section:not(#hero) { content-visibility: auto; contain-intrinsic-size: au
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 6px;
   padding: 2px 4px;
 }
@@ -189,14 +189,14 @@ main > section:not(#hero) { content-visibility: auto; contain-intrinsic-size: au
 .painel-brand-id {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
   min-width: 0;
 }
 
 .painel-logo-img {
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   border-radius: 8px;
   object-fit: contain;
   flex: none;
@@ -231,6 +231,16 @@ main > section:not(#hero) { content-visibility: auto; contain-intrinsic-size: au
   padding: 2px 0;
 }
 
+.painel-app.collapsed .painel-aside {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.painel-app.collapsed .painel-user {
+  justify-content: center;
+  padding: 7px;
+}
+
 .painel-app.collapsed .painel-tg {
   position: static;
   margin-top: 2px;
@@ -263,6 +273,8 @@ main > section:not(#hero) { content-visibility: auto; contain-intrinsic-size: au
 .painel-avatar {
   width: 32px;
   height: 32px;
+  max-width: none;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
   object-fit: cover;
   flex: none;
@@ -693,6 +705,14 @@ main > section:not(#hero) { content-visibility: auto; contain-intrinsic-size: au
   }
   .painel-tg {
     display: none;
+  }
+  .painel-app.collapsed .painel-aside {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .painel-app.collapsed .painel-user {
+    justify-content: flex-start;
+    padding: 8px 10px;
   }
   .painel-main {
     padding: 14px;
