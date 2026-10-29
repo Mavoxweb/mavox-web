@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MessageSquare, FileText, CheckCircle2 } from "lucide-react";
+import { trackProposalAccepted } from "@/lib/analytics";
 
 interface Proposal {
   id: string;
@@ -88,6 +89,9 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
 
       if (!res.ok) throw new Error("Erro ao aceitar proposta");
 
+      if (proposal) {
+        trackProposalAccepted(proposal.code, proposal.total || total);
+      }
       setAccepted(true);
     } catch (err) {
       setError("Erro ao aceitar proposta");
