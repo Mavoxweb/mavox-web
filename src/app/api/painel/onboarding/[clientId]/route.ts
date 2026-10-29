@@ -6,10 +6,10 @@ export async function GET(
   { params }: { params: Promise<{ clientId: string }> }
 ) {
   const { clientId } = await params;
-  const row = await queryOne(
+  const row = (await queryOne(
     `SELECT * FROM client_onboardings WHERE client_id = $1`,
     [clientId]
-  );
+  )) as { id: string } | null;
   if (!row) {
     return NextResponse.json({ found: false }, { status: 404 });
   }
