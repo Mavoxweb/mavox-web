@@ -74,7 +74,7 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [quoteRes, itemsRes, eventsRes] = await Promise.all([
+      const [quoteRes, itemsRes, eventsRes, clientsRes] = await Promise.all([
         fetch(`/api/painel/quotes/${quoteId}`),
         fetch(`/api/painel/quotes/${quoteId}/items`),
         fetch(`/api/painel/quotes/${quoteId}/events`),
