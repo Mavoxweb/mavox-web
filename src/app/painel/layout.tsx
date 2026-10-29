@@ -32,6 +32,11 @@ const navigation = [
   { name: "Configurações", href: "/painel/settings", icon: Settings },
 ];
 
+// Cores da Mavox
+const MAVox_BLUE = "bg-blue-600 text-white hover:bg-blue-700";
+const MAVox_BLUE_LIGHT = "bg-blue-50 border-blue-200 text-blue-800";
+const MAVox_BLUE_ACTIVE = "bg-blue-600/10 text-blue-600 border-blue-600/30";
+
 export default function AdminLayout({
   children,
 }: {
@@ -77,25 +82,21 @@ export default function AdminLayout({
     window.location.href = "/login";
   };
 
-  const wrapperClass = `min-h-screen flex transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-gray-50"}`;
-  const sidebarClass = `fixed inset-y-0 left-0 z-50 transition-all duration-300 ${collapsed ? "w-16" : "w-64"} ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`;
-  const sidebarBg = darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200";
-  const textPrimary = darkMode ? "text-gray-100" : "text-gray-900";
-  const textSecondary = darkMode ? "text-gray-400" : "text-gray-600";
-  const cardBg = darkMode ? "bg-gray-800" : "bg-white";
-  const cardBorder = darkMode ? "border-gray-700" : "border-gray-200";
-  const hoverBg = darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100";
-  const inputBg = darkMode ? "bg-gray-700" : "bg-white";
-  const inputBorder = darkMode ? "border-gray-600" : "border-gray-300";
-  const inputText = darkMode ? "text-gray-100" : "text-gray-900";
-  const headerBg = darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200";
-  const contentText = darkMode ? "text-gray-100" : "";
+  // Cores do tema
+  const isDark = darkMode;
+  const wrapperBg = isDark ? "bg-[#0f172a]" : "bg-[#f8fafc]";
+  const sidebarBg = isDark ? "bg-[#1e293b]" : "bg-white";
+  const sidebarBorder = isDark ? "border-[#334155]" : "border-[#e2e8f0]";
+  const textSecondary = isDark ? "text-[#94a3b8]" : "text-[#64748b]";
+  const hoverBg = isDark ? "hover:bg-[#334155]" : "hover:bg-[#f1f5f9]";
+  const headerBg = isDark ? "bg-[#1e293b] border-[#334155]" : "bg-white border-[#e2e8f0]";
+  const contentText = isDark ? "text-[#f1f5f9]" : "text-[#0f172a]";
 
   return (
-    <div className={wrapperClass}>
+    <div className={`${wrapperBg} flex transition-colors duration-300`}>
       {/* Sidebar */}
-      <aside className={`${sidebarBg} ${sidebarClass}`} aria-label="Navegação principal">
-        <div className="flex h-16 items-center justify-between px-4 border-b">
+      <aside className={`${sidebarBg} ${sidebarBorder} fixed inset-y-0 left-0 z-50 transition-all duration-300 ${collapsed ? "w-16" : "w-64"} ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`} aria-label="Navegação principal">
+        <div className="flex h-16 items-center justify-between px-4 border-b ${sidebarBorder}">
           <Link href="/painel/dashboard" className="flex items-center gap-2" aria-label="Mavox Admin">
             <img src="/logo.png" alt="Mavox" className="h-8" />
           </Link>
@@ -115,11 +116,11 @@ export default function AdminLayout({
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive ? "bg-blue-600/20 text-blue-400" : `${textSecondary} ${hoverBg}`} ${collapsed ? "justify-center" : ""}`}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive ? MAVox_BLUE_ACTIVE : `${textSecondary} ${hoverBg}`} ${collapsed ? "justify-center" : ""}`}
                 aria-current={isActive ? "page" : undefined}
                 title={collapsed ? item.name : undefined}
               >
-                <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-blue-400" : textSecondary}`} aria-hidden="true" />
+                <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-blue-600" : textSecondary}`} aria-hidden="true" />
                 {!collapsed && <span className="truncate">{item.name}</span>}
               </Link>
             );
@@ -136,7 +137,7 @@ export default function AdminLayout({
           </div>
         </nav>
 
-        <div className={`p-3 border-t ${darkMode ? "border-gray-700" : "border-gray-200"}`}>
+        <div className={`p-3 border-t ${sidebarBorder}`}>
           <Link
             href="/"
             target="_blank"
