@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
-export async function GET(request: Request) {
-  const cookie = request.cookies.get("mavox_session");
-  if (!cookie) {
+export async function GET() {
+  const cookieStore = cookies();
+  const session = cookieStore.get("mavox_session")?.value;
+  if (!session) {
     return NextResponse.json({ ok: false, user: null }, { status: 401 });
   }
 
   try {
-    const user = JSON.parse(cookie.value);
+    const user = JSON.parse(session);
     return NextResponse.json({ ok: true, user });
   } catch {
     return NextResponse.json({ ok: false, user: null }, { status: 401 });
