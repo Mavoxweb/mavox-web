@@ -43,7 +43,7 @@ export default function NewPostPage() {
 
   const fetchModels = async () => {
     try {
-      const res = await fetch("/api/painel/settings");
+      const res = await fetch("/api/painel/settings", { credentials: 'include' });
       const data = await res.json();
       if (data.openrouter_api_key) {
         setApiKeyConfigured(true);
@@ -87,6 +87,7 @@ export default function NewPostPage() {
       const res = await fetch("/api/painel/blog/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({
           trending_topic: formData.trending_topic,
           mavox_data: "Agência de desenvolvimento web, sites institucionais, e-commerce, sistemas sob medida, tráfego pago, branding e manutenção",
@@ -123,6 +124,7 @@ export default function NewPostPage() {
       const res = await fetch("/api/painel/blog", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({
           title: formData.title,
           slug: formData.slug || formData.title.toLowerCase().replace(/\s+/g, "-"),

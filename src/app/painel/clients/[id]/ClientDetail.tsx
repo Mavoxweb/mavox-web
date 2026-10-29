@@ -47,8 +47,8 @@ export function ClientDetail({ clientId }: { clientId: string }) {
     setLoading(true);
     try {
       const [clientRes, tagsRes] = await Promise.all([
-        fetch(`/api/painel/clients/${clientId}`),
-        fetch("/api/painel/tags?limit=50"),
+        fetch(`/api/painel/clients/${clientId}`, { credentials: 'include' }),
+        fetch("/api/painel/tags?limit=50", { credentials: 'include' }),
       ]);
 
       if (!clientRes.ok) {
@@ -100,6 +100,7 @@ export function ClientDetail({ clientId }: { clientId: string }) {
       const res = await fetch(`/api/painel/clients/${clientId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify(editData),
       });
 
@@ -114,7 +115,7 @@ export function ClientDetail({ clientId }: { clientId: string }) {
   const handleDelete = async () => {
     if (!confirm("Tem certeza que deseja excluir este cliente?")) return;
     try {
-      const res = await fetch(`/api/painel/clients/${clientId}`, { method: "DELETE" });
+      const res = await fetch(`/api/painel/clients/${clientId}`, { method: "DELETE", credentials: 'include' });
       if (!res.ok) throw new Error("Erro ao excluir");
       router.push("/painel/clients");
     } catch {

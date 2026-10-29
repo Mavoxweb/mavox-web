@@ -25,7 +25,7 @@ export default function PixelsPage() {
   const fetchPixels = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/painel/pixels");
+      const res = await fetch("/api/painel/pixels", { credentials: 'include' });
       const data = await res.json();
       setPixels(data.data);
     } catch (error) {
@@ -69,6 +69,7 @@ export default function PixelsPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
@@ -89,7 +90,7 @@ export default function PixelsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir este evento de pixel?")) return;
     try {
-      const res = await fetch(`/api/painel/pixels/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/painel/pixels/${id}`, { method: "DELETE", credentials: 'include' });
       if (!res.ok) throw new Error("Erro ao excluir");
       fetchPixels();
     } catch (error) {

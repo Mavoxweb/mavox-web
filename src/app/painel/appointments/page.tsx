@@ -45,7 +45,7 @@ export default function AppointmentsPage() {
       if (search) params.set("search", search);
       if (clientId) params.set("clientId", clientId);
 
-      const res = await fetch(`/api/painel/appointments?${params.toString()}`);
+      const res = await fetch(`/api/painel/appointments?${params.toString()}`, { credentials: 'include' });
       const data = await res.json();
       setAppointments(data.data || []);
     } catch (err) {
@@ -57,7 +57,7 @@ export default function AppointmentsPage() {
 
   const fetchClients = useCallback(async () => {
     try {
-      const res = await fetch("/api/painel/clients?limit=100");
+      const res = await fetch("/api/painel/clients?limit=100", { credentials: 'include' });
       const data = await res.json();
       setClients(data.data || []);
     } catch (err) {
@@ -114,6 +114,7 @@ export default function AppointmentsPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
@@ -134,7 +135,7 @@ export default function AppointmentsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir este agendamento?")) return;
     try {
-      const res = await fetch(`/api/painel/appointments/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/painel/appointments/${id}`, { method: "DELETE", credentials: 'include' });
       if (!res.ok) throw new Error("Erro ao excluir");
       fetchAppointments();
     } catch (err) {

@@ -48,7 +48,7 @@ export default function FollowupsPage() {
       params.set("limit", "100");
       if (stageFilter) params.set("stage", stageFilter);
 
-      const res = await fetch(`/api/painel/followups?${params.toString()}`);
+      const res = await fetch(`/api/painel/followups?${params.toString()}`, { credentials: 'include' });
       const data = await res.json();
       setFollowups(data.data || []);
     } catch (err) {
@@ -60,7 +60,7 @@ export default function FollowupsPage() {
 
   const fetchQuotes = useCallback(async () => {
     try {
-      const res = await fetch("/api/painel/quotes?limit=50");
+      const res = await fetch("/api/painel/quotes?limit=50", { credentials: 'include' });
       const data = await res.json();
       setQuotes(data.data || []);
     } catch (err) {
@@ -115,6 +115,7 @@ export default function FollowupsPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
@@ -135,7 +136,7 @@ export default function FollowupsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir esta mensagem de follow-up?")) return;
     try {
-      const res = await fetch(`/api/painel/followups/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/painel/followups/${id}`, { method: "DELETE", credentials: 'include' });
       if (!res.ok) throw new Error("Erro ao excluir");
       fetchFollowups();
     } catch (err) {

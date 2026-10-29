@@ -33,7 +33,7 @@ export default function SettingsPage() {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch("/api/painel/settings");
+      const res = await fetch("/api/painel/settings", { credentials: 'include' });
       const data = await res.json();
       setSettings(data);
     } catch (error) {
@@ -61,6 +61,7 @@ export default function SettingsPage() {
       const res = await fetch("/api/painel/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify(settings),
       });
 

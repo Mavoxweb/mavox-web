@@ -21,7 +21,7 @@ export default function NewClientPage() {
   useEffect(() => {
     async function fetchTags() {
       try {
-        const res = await fetch("/api/painel/tags?limit=50");
+        const res = await fetch("/api/painel/tags?limit=50", { credentials: 'include' });
         const data = await res.json();
         setTags(data.data);
       } catch (error) {
@@ -44,6 +44,7 @@ export default function NewClientPage() {
       const res = await fetch("/api/painel/clients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({ name, email, phone, company, source, intent, tagIds }),
       });
 

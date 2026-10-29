@@ -41,7 +41,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
 
   const fetchPost = async () => {
     try {
-      const res = await fetch(`/api/painel/blog/${(await params).id}`);
+      const res = await fetch(`/api/painel/blog/${(await params).id}`, { credentials: 'include' });
       if (!res.ok) {
         router.push("/painel/blog");
         return;
@@ -65,7 +65,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch("/api/settings");
+      const res = await fetch("/api/painel/settings", { credentials: 'include' });
       const data = await res.json();
       setApiKeyConfigured(!!data.openrouter_api_key);
     } catch (err) {
@@ -81,6 +81,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
       const res = await fetch("/api/painel/blog/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({
           trending_topic: formData.title || "",
           mavox_data: "Agência de desenvolvimento web, sites institucionais, e-commerce, sistemas sob medida, tráfego pago, branding e manutenção",
@@ -117,6 +118,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
       const res = await fetch(`/api/painel/blog/${(await params).id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({
           title: formData.title,
           slug: formData.slug || formData.title.toLowerCase().replace(/\s+/g, "-"),
@@ -147,7 +149,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
   const handleDelete = async () => {
     if (!confirm("Tem certeza que deseja excluir este artigo?")) return;
     try {
-      const res = await fetch(`/api/painel/blog/${(await params).id}`, { method: "DELETE" });
+      const res = await fetch(`/api/painel/blog/${(await params).id}`, { method: "DELETE", credentials: 'include' });
       if (!res.ok) throw new Error("Erro ao excluir");
       router.push("/painel/blog");
       router.refresh();

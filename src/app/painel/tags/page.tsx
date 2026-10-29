@@ -25,7 +25,7 @@ export default function TagsPage() {
   const fetchTags = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/painel/tags?limit=100");
+      const res = await fetch("/api/painel/tags?limit=100", { credentials: 'include' });
       const data = await res.json();
       setTags(data.data);
     } catch (error) {
@@ -69,6 +69,7 @@ export default function TagsPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
@@ -90,7 +91,7 @@ export default function TagsPage() {
     if (!confirm("Tem certeza que deseja excluir esta tag?")) return;
 
     try {
-      const res = await fetch(`/api/painel/tags/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/painel/tags/${id}`, { method: "DELETE", credentials: 'include' });
       if (!res.ok) throw new Error("Erro ao excluir");
       fetchTags();
     } catch (error) {

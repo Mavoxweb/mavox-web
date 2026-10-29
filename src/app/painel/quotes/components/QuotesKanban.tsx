@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Search, ChevronLeft, ChevronRight, ExternalLink, Edit, Phone } from "lucide-react";
+import { Plus, Search, ChevronLeft, ChevronRight, ExternalLink, Edit, Phone, User, X } from "lucide-react";
 import Link from "next/link";
 
 function getBudgetLabel(range: string | null) {
@@ -254,62 +254,124 @@ export function QuotesKanban() {
 }
 
 function QuoteCard({ quote, onDragStart }: { quote: Quote; onDragStart: (e: React.DragEvent, quote: Quote) => void }) {
+  const [showPreview, setShowPreview] = useState(false);
+
   return (
-    <article
-      draggable
-      onDragStart={(e) => onDragStart(e, quote)}
-      className="bg-white dark:bg-[#1e293b] rounded-xl border border-[#e2e8f0] dark:border-[#334155] p-5 shadow-sm hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing"
-      role="listitem"
-    >
-      <div className="flex items-start justify-between mb-3">
-        <span className="font-mono text-xs font-bold text-[#64748b] dark:text-[#94a3b8]">{quote.code}</span>
-        <span className={`text-xs font-bold px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300`}>
-          {quote.total ? "R$ " + Number(quote.total).toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : "—"}
-        </span>
-      </div>
-      <div className="space-y-2 text-sm">
-        <p className="font-medium text-[#0f172a] dark:text-[#f1f5f9] truncate">{quote.clientName}</p>
-        <p className="text-xs text-[#64748b] dark:text-[#94a3b8] truncate">{quote.clientEmail}</p>
-        <div className="mt-2 space-y-1">
-          {quote.budget_range && (
-            <p className="text-xs text-[#64748b] dark:text-[#94a3b8]">
-              <span className="font-bold text-[#0f172a] dark:text-[#f1f5f9]">Orçamento:</span> {getBudgetLabel(quote.budget_range)}
-            </p>
-          )}
-          {quote.deadline_pref && (
-            <p className="text-xs text-[#64748b] dark:text-[#94a3b8]">
-              <span className="font-bold text-[#0f172a] dark:text-[#f1f5f9]">Prazo:</span> {getDeadlineLabel(quote.deadline_pref)}
-            </p>
+    <>
+      <article
+        draggable
+        onDragStart={(e) => onDragStart(e, quote)}
+        onClick={() => setShowPreview(true)}
+        className="bg-white dark:bg-[#1e293b] rounded-xl border border-[#e2e8f0] dark:border-[#334155] p-5 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+        role="listitem"
+      >
+        <div className="flex items-start justify-between mb-3">
+          <span className="font-mono text-xs font-bold text-[#64748b] dark:text-[#94a3b8]">{quote.code}</span>
+          <span className={`text-xs font-bold px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300`}>
+            {quote.total ? "R$ " + Number(quote.total).toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : "—"}
+          </span>
+        </div>
+        <div className="space-y-2 text-sm">
+          <p className="font-medium text-[#0f172a] dark:text-[#f1f5f9] truncate">{quote.clientName}</p>
+          <p className="text-xs text-[#64748b] dark:text-[#94a3b8] truncate">{quote.clientEmail}</p>
+          <div className="mt-2 space-y-1">
+            {quote.budget_range && (
+              <p className="text-xs text-[#64748b] dark:text-[#94a3b8]">
+                <span className="font-bold text-[#0f172a] dark:text-[#f1f5f9]">Orçamento:</span> {getBudgetLabel(quote.budget_range)}
+              </p>
+            )}
+            {quote.deadline_pref && (
+              <p className="text-xs text-[#64748b] dark:text-[#94a3b8]">
+                <span className="font-bold text-[#0f172a] dark:text-[#f1f5f9]">Prazo:</span> {getDeadlineLabel(quote.deadline_pref)}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="mt-4 flex items-center justify-end gap-2">
+          <Link
+            href={`/painel/quotes/${quote.id}`}
+            className="p-1.5 rounded-md text-[#64748b] dark:text-[#94a3b8] hover:text-blue-600 dark:hover:text-blue-400 hover:bg-[#f1f5f9] dark:hover:bg-[#334155] transition-colors"
+            title="Ver detalhes"
+            onClick={(e) => { e.stopPropagation(); }}
+          >
+            <ExternalLink className="w-4 h-4" />
+          </Link>
+          <Link
+            href={`/painel/quotes/${quote.id}`}
+            className="p-1.5 rounded-md text-[#64748b] dark:text-[#94a3b8] hover:text-blue-600 dark:hover:text-blue-400 hover:bg-[#f1f5f9] dark:hover:bg-[#334155] transition-colors"
+            title="Editar"
+            onClick={(e) => { e.stopPropagation(); }}
+          >
+            <Edit className="w-4 h-4" />
+          </Link>
+          {quote.clientPhone && (
+            <a
+              href={`https://wa.me/${quote.clientPhone.replace(/\D/g, "")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-1.5 rounded-md text-green-600 dark:text-green-400 hover:text-green-500 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
+              title="WhatsApp"
+              onClick={(e) => { e.stopPropagation(); }}
+            >
+              <Phone className="w-4 h-4" />
+            </a>
           )}
         </div>
-      </div>
-      <div className="mt-4 flex items-center justify-end gap-2">
-        <Link
-          href={`/painel/quotes/${quote.id}`}
-          className="p-1.5 rounded-md text-[#64748b] dark:text-[#94a3b8] hover:text-blue-600 dark:hover:text-blue-400 hover:bg-[#f1f5f9] dark:hover:bg-[#334155] transition-colors"
-          title="Ver detalhes"
-        >
-          <ExternalLink className="w-4 h-4" />
-        </Link>
-        <Link
-          href={`/painel/quotes/${quote.id}`}
-          className="p-1.5 rounded-md text-[#64748b] dark:text-[#94a3b8] hover:text-blue-600 dark:hover:text-blue-400 hover:bg-[#f1f5f9] dark:hover:bg-[#334155] transition-colors"
-          title="Editar"
-        >
-          <Edit className="w-4 h-4" />
-        </Link>
-        {quote.clientPhone && (
-          <a
-            href={`https://wa.me/${quote.clientPhone.replace(/\D/g, "")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-1.5 rounded-md text-green-600 dark:text-green-400 hover:text-green-500 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
-            title="WhatsApp"
-          >
-            <Phone className="w-4 h-4" />
-          </a>
-        )}
-      </div>
-    </article>
+      </article>
+
+      {/* Preview Drawer */}
+      {showPreview && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowPreview(false)}>
+          <div className="bg-white dark:bg-[#1e293b] rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: "var(--bd)" }}>
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-xs font-bold text-[#64748b] dark:text-[#94a3b8]">{quote.code}</span>
+                <span className={`text-xs font-bold px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300`}>
+                  {quote.total ? "R$ " + Number(quote.total).toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : "—"}
+                </span>
+              </div>
+              <button onClick={() => setShowPreview(false)} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                <X className="w-5 h-5" style={{ color: "var(--mu)" }} />
+              </button>
+            </div>
+            <div className="p-4 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                  <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-[#0f172a] dark:text-[#f1f5f9]">{quote.clientName}</p>
+                  <p className="text-xs text-[#64748b] dark:text-[#94a3b8]">{quote.clientEmail}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                {quote.budget_range && (
+                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+                    <p className="text-xs font-medium text-[#64748b] dark:text-[#94a3b8]">Orçamento</p>
+                    <p className="font-medium text-[#0f172a] dark:text-[#f1f5f9]">{getBudgetLabel(quote.budget_range)}</p>
+                  </div>
+                )}
+                {quote.deadline_pref && (
+                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+                    <p className="text-xs font-medium text-[#64748b] dark:text-[#94a3b8]">Prazo Preferido</p>
+                    <p className="font-medium text-[#0f172a] dark:text-[#f1f5f9]">{getDeadlineLabel(quote.deadline_pref)}</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end gap-2 pt-4 border-t" style={{ borderColor: "var(--bd)" }}>
+                <Link
+                  href={`/painel/quotes/${quote.id}`}
+                  onClick={() => setShowPreview(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Ver Detalhes Completos
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

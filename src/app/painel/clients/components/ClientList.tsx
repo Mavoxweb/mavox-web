@@ -48,7 +48,7 @@ export function ClientList() {
     if (tagFilter) params.set("tag", tagFilter);
 
     try {
-      const res = await fetch(`/api/painel/clients?${params.toString()}`);
+      const res = await fetch(`/api/painel/clients?${params.toString()}`, { credentials: 'include' });
       const data = await res.json();
       setClients(data.data);
       setPagination(data.pagination);
@@ -61,7 +61,7 @@ export function ClientList() {
 
   const fetchTags = useCallback(async () => {
     try {
-      const res = await fetch("/api/painel/tags?limit=50");
+      const res = await fetch("/api/painel/tags?limit=50", { credentials: 'include' });
       const data = await res.json();
       setTags(data.data);
     } catch (error) {
