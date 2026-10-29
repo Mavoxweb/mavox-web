@@ -5,6 +5,7 @@ import "./globals.css";
 import { SITE } from "@/lib/site";
 import { Floating } from "@/components/Floating";
 import { PixelTracker } from "@/components/PixelTracker";
+import GtmDataLayer from "@/components/GtmDataLayer";
 import { getActivePixelConfigs } from "@/lib/pixels-repository";
 
 const sora = Sora({
@@ -259,7 +260,11 @@ export default async function RootLayout({
         <PixelTracker
           metaPixelId={pixelConfigs.metaPixelId}
           googleTagId={pixelConfigs.googleTagId}
+          gtmId={process.env.NEXT_PUBLIC_GTM_ID}
+          metaCapiAccessToken={process.env.META_CAPI_ACCESS_TOKEN}
+          metaCapiPixelId={process.env.META_CAPI_PIXEL_ID}
         />
+        <GtmDataLayer />
       </body>
     </html>
   );
