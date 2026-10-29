@@ -31,7 +31,9 @@ export async function verifyToken(token: string): Promise<AuthUser | null> {
   }
 }
 
-export async function signIn(email: string, password: string): Promise<{ token: string; user: AuthUser } | null> {
+// signIn NÃO precisa verificar o token via JWKS — o Neon Auth já retorna um token válido.
+// A verificação server-side é feita pelo middleware.
+export async function signIn(email: string, password: string): Promise<{ token: string; user: Partial<AuthUser> } | null> {
   const baseUrl = process.env.NEON_AUTH_BASE_URL;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
   if (!baseUrl) return null;
@@ -43,11 +45,10 @@ export async function signIn(email: string, password: string): Promise<{ token: 
   });
   if (!res.ok) return null;
   const data = await res.json();
-  const user = await verifyToken(data.token);
-  return user ? { token: data.token, user } : null;
+  return data.token ? { token: data.token, user: data.user || {} } : null;
 }
 
-export async function signUp(email: string, password: string, name: string): Promise<{ token: string; user: AuthUser } | null> {
+export async function signUp(email: string, password: string, name: string): Promise<{ token: string; user: Partial<AuthUser> } | null> {
   const baseUrl = process.env.NEON_AUTH_BASE_URL;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
   if (!baseUrl) return null;
@@ -59,8 +60,7 @@ export async function signUp(email: string, password: string, name: string): Pro
   });
   if (!res.ok) return null;
   const data = await res.json();
-  const user = await verifyToken(data.token);
-  return user ? { token: data.token, user } : null;
+  return data.token ? { token: data.token, user: data.user || {} } : null;
 }
 
 export function getAuthCookieName(): string {
