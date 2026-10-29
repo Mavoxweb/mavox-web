@@ -178,35 +178,42 @@ main > section:not(#hero) { content-visibility: auto; contain-intrinsic-size: au
 }
 
 .painel-brand {
+  position: relative;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   padding: 2px 4px;
 }
 
+.painel-brand-id {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
 .painel-logo-img {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
   object-fit: contain;
   flex: none;
 }
 
-.painel-brand b {
-  display: block;
-  font-size: 14px;
-  color: var(--tx);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.painel-brand small {
+.painel-brand-txt {
   color: var(--mu);
   font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 
 .painel-tg {
-  margin-left: auto;
+  position: absolute;
+  top: 2px;
+  right: 0;
   color: var(--mu);
   padding: 6px;
   border-radius: 8px;
@@ -217,6 +224,16 @@ main > section:not(#hero) { content-visibility: auto; contain-intrinsic-size: au
   background: none;
   border: 0;
   transition: background 0.15s, color 0.15s;
+}
+
+.painel-app.collapsed .painel-brand {
+  align-items: center;
+  padding: 2px 0;
+}
+
+.painel-app.collapsed .painel-tg {
+  position: static;
+  margin-top: 2px;
 }
 
 .painel-tg:hover {
@@ -673,6 +690,9 @@ main > section:not(#hero) { content-visibility: auto; contain-intrinsic-size: au
   }
   .painel-burger {
     display: block;
+  }
+  .painel-tg {
+    display: none;
   }
   .painel-main {
     padding: 14px;

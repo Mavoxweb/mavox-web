@@ -100,20 +100,19 @@ export default function AdminLayout({
       <aside className="painel-aside" aria-label="Navegação principal">
         {/* Brand */}
         <div className="painel-brand">
-          <img 
-            src="/Logo MAVOX Verde Vibrante.png" 
-            alt="Mavox" 
-            className="painel-logo-img" 
-          />
-          <div className="lbl">
-            <b>Mavox CRM</b>
-            <small>Painel Administrativo</small>
+          <div className="painel-brand-id">
+            <img
+              src="/Logo MAVOX Verde Vibrante.png"
+              alt="Mavox"
+              className="painel-logo-img"
+            />
+            <small className="painel-brand-txt lbl">Painel administrativo</small>
           </div>
           <button
             onClick={() => setCollapsed(!collapsed)}
             className="painel-tg"
             aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
-            title={collapsed ? "Expandir" : "Recolher"}
+            title={collapsed ? "Expandir menu" : "Recolher menu"}
           >
             {collapsed ? (
               <ChevronRight className="w-4 h-4" />
