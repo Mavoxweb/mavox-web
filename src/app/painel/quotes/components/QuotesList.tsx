@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, Filter, ChevronDown, ExternalLink, Edit, Trash2 } from "lucide-react";
+import { Search, Filter, ChevronDown, ExternalLink, Edit } from "lucide-react";
 import Link from "next/link";
 
 interface Quote {

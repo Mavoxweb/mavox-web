@@ -1,5 +1,4 @@
 import { QuotesKanban } from "./components/QuotesKanban";
-import { QuotesList } from "./components/QuotesList";
 
 export default async function QuotesPage() {
   return (

@@ -284,23 +284,3 @@ function QuoteCard({ quote, onDragStart }: { quote: Quote; onDragStart: (e: Reac
     </article>
   );
 }
-
-function getBudgetLabel(range: string | null) {
-  const labels: Record<string, string> = {
-    "ate-3k": "Até R$ 3 mil",
-    "3k-8k": "R$ 3 mil a R$ 8 mil",
-    "8k-20k": "R$ 8 mil a R$ 20 mil",
-    "acima-20k": "Acima de R$ 20 mil",
-    "nao-sei": "Ainda não sei",
-  };
-  return range ? labels[range] : "Não informado";
-}
-
-function getDeadlineLabel(deadline: string | null) {
-  const labels: Record<string, string> = {
-    urgente: "O quanto antes",
-    "30-dias": "Em até 30 dias",
-    "sem-pressa": "Sem pressa",
-  };
-  return deadline ? labels[deadline] : "Não informado";
-}
