@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MessageSquare, FileText, CheckCircle2 } from "lucide-react";
+import { MessageSquare, FileText, CheckCircle2, Minus, Plus, Percent, Tag } from "lucide-react";
 import { trackProposalAccepted } from "@/lib/analytics";
 
 interface Proposal {
@@ -31,6 +31,14 @@ interface Proposal {
   }>;
 }
 
+type DiscountType = "none" | "percent" | "fixed";
+
+interface ItemAdjustment {
+  quantity: number;
+  discountType: DiscountType;
+  discountValue: number;
+}
+
 export default function ProposalPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = use(params);
   const router = useRouter();
@@ -39,10 +47,20 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
   const [error, setError] = useState("");
   const [pdfLoading, setPdfLoading] = useState(false);
   const [accepted, setAccepted] = useState(false);
+  const [adjustments, setAdjustments] = useState<Record<string, ItemAdjustment>>({});
+  const [viewedTracked, setViewedTracked] = useState(false);
 
   useEffect(() => {
     fetchProposal();
   }, [token]);
+
+  // Track viewed_at on first load
+  useEffect(() => {
+    if (proposal && !viewedTracked) {
+      trackProposalViewed(token);
+      setViewedTracked(true);
+    }
+  }, [proposal, token, viewedTracked]);
 
   const fetchProposal = async () => {
     try {
@@ -50,12 +68,72 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
       if (!res.ok) throw new Error("Proposta não encontrada");
       const data = await res.json();
       setProposal(data);
+      // Initialize adjustments with current quantities
+      const initialAdjustments: Record<string, ItemAdjustment> = {};
+      data.items?.forEach((item: { id: string; quantity: number }) => {
+        initialAdjustments[item.id] = {
+          quantity: item.quantity,
+          discountType: "none",
+          discountValue: 0,
+        };
+      });
+      setAdjustments(initialAdjustments);
     } catch (err) {
       setError("Erro ao carregar proposta");
     } finally {
       setLoading(false);
     }
   };
+
+  const trackProposalViewed = async (proposalToken: string) => {
+    try {
+      await fetch(`/api/propostas/${proposalToken}/view`, { method: "POST" });
+    } catch (err) {
+      console.warn("Não foi possível registrar visualização:", err);
+    }
+  };
+
+  const updateQuantity = (itemId: string, delta: number) => {
+    setAdjustments((prev) => {
+      const current = prev[itemId] || { quantity: 1, discountType: "none", discountValue: 0 };
+      return {
+        ...prev,
+        [itemId]: { ...current, quantity: Math.max(1, current.quantity + delta) },
+      };
+    });
+  };
+
+  const updateDiscount = (itemId: string, type: DiscountType, value: number) => {
+    setAdjustments((prev) => {
+      const current = prev[itemId] || { quantity: 1, discountType: "none", discountValue: 0 };
+      return {
+        ...prev,
+        [itemId]: { ...current, discountType: type, discountValue: Math.max(0, value) },
+      };
+    });
+  };
+
+  const calculateItemTotal = (item: { id: string; unit_price: number | null }, adj: ItemAdjustment) => {
+    const basePrice = item.unit_price || 0;
+    const qty = adj.quantity;
+    let subtotal = basePrice * qty;
+
+    if (adj.discountType === "percent" && adj.discountValue > 0) {
+      subtotal *= 1 - adj.discountValue / 100;
+    } else if (adj.discountType === "fixed" && adj.discountValue > 0) {
+      subtotal = Math.max(0, subtotal - adj.discountValue);
+    }
+
+    return subtotal;
+  };
+
+  const total = useMemo(() => {
+    if (!proposal) return 0;
+    return proposal.items.reduce((sum, item) => {
+      const adj = adjustments[item.id] || { quantity: item.quantity, discountType: "none", discountValue: 0 };
+      return sum + calculateItemTotal(item, adj);
+    }, 0);
+  }, [proposal, adjustments]);
 
   const handleGeneratePDF = async () => {
     setPdfLoading(true);
@@ -106,11 +184,6 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
     );
     window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
   };
-
-  const total = proposal?.items?.reduce(
-    (sum, item) => sum + (item.unit_price || 0) * item.quantity,
-    0
-  );
 
   if (loading) {
     return (
@@ -235,30 +308,73 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
                   <th className="px-6 py-3 text-left text-xs font-semibold text-[#64748b]">Descrição</th>
                   <th className="px-6 py-3 text-right text-xs font-semibold text-[#64748b]">Qtde</th>
                   <th className="px-6 py-3 text-right text-xs font-semibold text-[#64748b]">Unitário</th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-[#64748b]">Desconto</th>
                   <th className="px-6 py-3 text-right text-xs font-semibold text-[#64748b]">Total</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#e2e8f0]">
-                {proposal.items.map((item, index) => (
-                  <tr key={item.id} className="hover:bg-[#f8fafc]">
-                    <td className="px-6 py-4 text-[#0f172a] font-medium">
-                      {item.description}
-                    </td>
-                    <td className="px-6 py-4 text-right text-[#475569]">{item.quantity}</td>
-                    <td className="px-6 py-4 text-right text-[#475569]">
-                      {item.unit_price ? `R$ ${Number(item.unit_price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "—"}
-                    </td>
-                    <td className="px-6 py-4 text-right text-[#475569] font-medium">
-                      {item.unit_price
-                        ? `R$ ${Number(item.unit_price * item.quantity).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
-                        : "—"}
-                    </td>
-                  </tr>
-                ))}
+                {proposal.items.map((item, index) => {
+                  const adj = adjustments[item.id] || { quantity: item.quantity, discountType: "none", discountValue: 0 };
+                  const itemTotal = calculateItemTotal(item, adj);
+                  return (
+                    <tr key={item.id} className="hover:bg-[#f8fafc]">
+                      <td className="px-6 py-4 text-[#0f172a] font-medium">
+                        {item.description}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="inline-flex items-center gap-2 justify-end">
+                          <button
+                            onClick={() => updateQuantity(item.id, -1)}
+                            className="p-1.5 rounded bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+                            aria-label="Diminuir quantidade"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <span className="w-16 text-center text-[#475569] font-medium">{adj.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(item.id, 1)}
+                            className="p-1.5 rounded bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+                            aria-label="Aumentar quantidade"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right text-[#475569]">
+                        {item.unit_price ? `R$ ${Number(item.unit_price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "—"}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <select
+                          value={adj.discountType}
+                          onChange={(e) => updateDiscount(item.id, e.target.value as DiscountType, adj.discountValue)}
+                          className="w-28 px-2 py-1 text-xs border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white"
+                        >
+                          <option value="none">Sem desconto</option>
+                          <option value="percent">% Porcentagem</option>
+                          <option value="fixed">R$ Valor fixo</option>
+                        </select>
+                        {(adj.discountType === "percent" || adj.discountType === "fixed") && (
+                          <input
+                            type="number"
+                            min="0"
+                            step={adj.discountType === "percent" ? "0.1" : "0.01"}
+                            value={adj.discountValue}
+                            onChange={(e) => updateDiscount(item.id, adj.discountType, adj.discountType === "percent" ? parseFloat(e.target.value) || 0 : parseFloat(e.target.value) || 0)}
+                            className="w-24 ml-2 px-2 py-1 text-xs border border-[#e2e8f0] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white"
+                            placeholder={adj.discountType === "percent" ? "%" : "R$"}
+                          />
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-right text-[#475569] font-medium">
+                        {item.unit_price ? `R$ ${itemTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
               <tfoot className="bg-[#f8fafc]">
                 <tr>
-                  <td className="px-6 py-4 text-right text-sm font-medium text-[#0f172a]" colSpan={3}>
+                  <td className="px-6 py-4 text-right text-sm font-medium text-[#0f172a]" colSpan={4}>
                     Total
                   </td>
                   <td className="px-6 py-4 text-right text-xl font-bold text-[#0f172a]">
