@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { query, run } from "@/lib/db";
+import { query, run, queryOne } from "@/lib/db";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
