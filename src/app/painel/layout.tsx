@@ -43,6 +43,16 @@ export default function AdminLayout({
     setMobileOpen(false);
   }, [pathname]);
 
+  const handleSignout = async () => {
+    try {
+      await fetch("/api/auth/signout", { method: "POST" });
+    } catch {
+      // Ignorar erro de rede
+    }
+    document.cookie = "neon_auth_session=; path=/; max-age=0";
+    window.location.href = "/painel/login";
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
@@ -138,15 +148,13 @@ export default function AdminLayout({
                   <Settings className="w-5 h-5 text-gray-500" />
                 </Link>
 
-                <form action="/api/auth/signout" method="POST">
-                  <button
-                    type="submit"
-                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700"
-                    aria-label="Sair"
-                  >
-                    <LogOut className="w-5 h-5" />
-                  </button>
-                </form>
+                <button
+                  onClick={handleSignout}
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700"
+                  aria-label="Sair"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
               </div>
             </div>
           </div>
