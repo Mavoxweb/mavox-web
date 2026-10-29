@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { ClientList } from "./components/ClientList";
 import Link from "next/link";
 
@@ -20,7 +21,9 @@ export default async function ClientsPage() {
         </Link>
       </div>
 
-      <ClientList />
+      <Suspense fallback={<div className="bg-white rounded-xl border border-gray-200 p-8 text-center"><div className="animate-pulse text-gray-400">Carregando clientes...</div></div>}>
+        <ClientList />
+      </Suspense>
     </div>
   );
 }

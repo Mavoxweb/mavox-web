@@ -15,9 +15,19 @@ export default function NewClientPage() {
   const [intent, setIntent] = useState("conhecer");
   const [tagIds, setTagIds] = useState<string[]>([]);
   const [tags, setTags] = useState<{ id: string; name: string; color: string }[]>([]);
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    async function fetchTags() {
+      try {
+        const res = await fetch("/api/painel/tags?limit=50");
+        const data = await res.json();
+        setTags(data.data);
+      } catch (error) {
+        console.error("Erro ao buscar tags:", error);
+      }
+    }
     fetchTags();
   }, []);
 

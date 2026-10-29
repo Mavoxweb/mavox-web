@@ -1,5 +1,6 @@
 import { getDashboardMetrics } from "@/lib/dashboard-repository";
 import { DashboardMetrics } from "@/app/painel/dashboard/components/MetricsCards";
+import Link from "next/link";
 
 export default async function DashboardPage() {
   const metrics = await getDashboardMetrics();
@@ -29,22 +30,22 @@ function QuickActions() {
     <div className="bg-white rounded-xl border border-gray-200 p-6">
       <h2 className="text-lg font-semibold text-gray-900 mb-4">Ações Rápidas</h2>
       <div className="space-y-3">
-        <a href="/painel/clients/new" className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+        <Link href="/painel/clients/new" className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
           <p className="font-medium text-gray-900">Novo Cliente</p>
           <p className="text-sm text-gray-500 mt-1">Cadastrar cliente externo manualmente</p>
-        </a>
-        <a href="/painel/quotes" className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+        </Link>
+        <Link href="/painel/quotes" className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
           <p className="font-medium text-gray-900">Ver Orçamentos</p>
           <p className="text-sm text-gray-500 mt-1">Gerenciar funil de vendas</p>
-        </a>
-        <a href="/painel/blog/new" className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+        </Link>
+        <Link href="/painel/blog/new" className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
           <p className="font-medium text-gray-900">Novo Artigo do Blog</p>
           <p className="text-sm text-gray-500 mt-1">Criar conteúdo com IA</p>
-        </a>
-        <a href="/painel/appointments" className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+        </Link>
+        <Link href="/painel/appointments" className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
           <p className="font-medium text-gray-900">Agendar Reunião</p>
           <p className="text-sm text-gray-500 mt-1">Marcar call com cliente</p>
-        </a>
+        </Link>
       </div>
     </div>
   );
@@ -58,7 +59,7 @@ async function RecentLeads() {
     <div className="bg-white rounded-xl border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-gray-900">Leads Recentes</h2>
-        <a href="/painel/clients" className="text-sm text-blue-600 hover:text-blue-700">Ver todos</a>
+        <Link href="/painel/clients" className="text-sm text-blue-600 hover:text-blue-700">Ver todos</Link>
       </div>
       {leads.length === 0 ? (
         <p className="text-gray-500 text-center py-8">Nenhum lead cadastrado</p>
@@ -89,7 +90,7 @@ async function RecentQuotes() {
     <div className="bg-white rounded-xl border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-gray-900">Orçamentos Recentes</h2>
-        <a href="/painel/quotes" className="text-sm text-blue-600 hover:text-blue-700">Ver todos</a>
+        <Link href="/painel/quotes" className="text-sm text-blue-600 hover:text-blue-700">Ver todos</Link>
       </div>
       {quotes.length === 0 ? (
         <p className="text-gray-500 text-center py-8">Nenhum orçamento</p>
