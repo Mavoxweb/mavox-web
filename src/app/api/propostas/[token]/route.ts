@@ -59,6 +59,10 @@ export async function GET(
       [quote.lead_id]
     );
 
+    if (!client) {
+      return NextResponse.json({ error: "Cliente não encontrado" }, { status: 404 });
+    }
+
     // Buscar itens do orçamento
     const items = await query<{
       id: string;

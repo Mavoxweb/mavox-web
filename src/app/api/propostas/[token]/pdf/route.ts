@@ -4,7 +4,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
 // Register font descriptors for pdfmake
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+(pdfMake as any).vfs = pdfFonts;
 
 export async function GET(
   request: Request,
@@ -63,6 +63,10 @@ export async function GET(
       [quote.lead_id]
     );
 
+    if (!client) {
+      return NextResponse.json({ error: "Cliente não encontrado" }, { status: 404 });
+    }
+
     // Buscar itens do orçamento
     const items = await query<{
       id: string;
@@ -82,7 +86,7 @@ export async function GET(
     const total = items.reduce((sum, item) => sum + (item.unit_price || 0) * item.quantity, 0);
 
     // Gerar PDF com pdfmake
-    const docDefinition = {
+    const docDefinition: any = {
       pageSize: "A4",
       pageMargins: [40, 60, 40, 60],
       header: [
@@ -264,10 +268,10 @@ export async function GET(
       },
     };
 
-    const pdfDoc = pdfMake.createPdf(docDefinition);
-    const pdfBuffer = await pdfMake.makeBuffer(pdfDoc);
+    const pdfDoc = (pdfMake as any).createPdf(docDefinition);
+    const pdfBuffer = await (pdfMake as any).makeBuffer(pdfDoc);
 
-    return new NextResponse(Buffer.from(pdfDoc), {
+    return new NextResponse(Buffer.from(pdfBuffer as ArrayBuffer), {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="proposta-${quote.code}.pdf"`,

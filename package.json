@@ -32,6 +32,7 @@
         "@eslint/eslintrc": "^3.3.7",
         "@tailwindcss/postcss": "^4.0.0",
         "@types/node": "^22",
+        "@types/pdfmake": "^0.3.3",
         "@types/react": "^19",
         "@types/react-dom": "^19",
         "eslint": "^9.39.5",

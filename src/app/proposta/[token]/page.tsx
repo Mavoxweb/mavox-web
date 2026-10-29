@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Link, useRouter } from "next/navigation";
-import { WhatsApp, FileText, ExternalLink, CheckCircle2, Mail } from "lucide-react";
+import { useState, useEffect, use } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { MessageSquare, FileText, CheckCircle2 } from "lucide-react";
 
 interface Proposal {
   id: string;
   code: string;
   quote_id: string;
   version: number;
+  status: string;
   client: {
     id: string;
     name: string;
@@ -29,7 +31,7 @@ interface Proposal {
 }
 
 export default function ProposalPage({ params }: { params: Promise<{ token: string }> }) {
-  const { token } = params;
+  const { token } = use(params);
   const router = useRouter();
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [loading, setLoading] = useState(true);
@@ -110,7 +112,7 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin text-4xl text-blue-600">⟳</div>
-</div>
+      </div>
     );
   }
 
@@ -123,8 +125,8 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
           <a href="/" className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             Voltar ao início
           </a>
-  
-
+        </div>
+      </div>
     );
   }
 
@@ -134,7 +136,7 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
         <div className="text-center p-8 bg-white rounded-xl shadow-lg border border-green-200 max-w-md">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 className="w-8 h-8 text-green-600" />
-    
+          </div>
           <h1 className="text-2xl font-bold text-[#0f172a] mb-2">Proposta Aceita!</h1>
           <p className="text-[#64748b] mb-6">Obrigado por confiar na Mavox. Nossa equipe entrará em contato em breve.</p>
           <div className="flex gap-2">
@@ -147,9 +149,9 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
             >
               📱 WhatsApp
             </button>
-    
-  
-
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -162,13 +164,13 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
             <div className="flex items-center gap-3">
               <img src="/logo.png" alt="Mavox" className="h-8" />
               <span className="font-bold text-[#0f172a] text-lg">Mavox</span>
-      
+            </div>
             <div className="text-right">
               <p className="text-sm text-[#64748b]">Proposta #{proposal.code}</p>
               <p className="text-xs text-[#94a3b8]">Versão {proposal.version}</p>
-      
-    
-  
+            </div>
+          </div>
+        </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
@@ -186,7 +188,7 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
             {proposal.client.phone && (
               <p className="text-sm text-[#64748b]">{proposal.client.phone}</p>
             )}
-    
+          </div>
           <div className="flex items-center gap-3 mt-4 md:mt-0">
             <button
               onClick={handleWhatsApp}
@@ -206,8 +208,8 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
               )}
               PDF
             </button>
-    
-  
+          </div>
+        </div>
 
         {/* Accept Button */}
         {proposal.status !== "aprovado" && (
@@ -220,50 +222,50 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
           </button>
         )}
 
-
-      {/* Items Table */}
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
-        <div className="bg-white rounded-xl border border-[#e2e8f0] shadow-sm overflow-hidden">
-          <table className="w-full text-left">
-            <thead className="bg-[#f8fafc] border-b border-[#e2e8f0]">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-[#64748b]">Descrição</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-[#64748b]">Qtde</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-[#64748b]">Unitário</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-[#64748b]">Total</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#e2e8f0]">
-              {proposal.items.map((item, index) => (
-                <tr key={item.id} className="hover:bg-[#f8fafc]">
-                  <td className="px-6 py-4 text-[#0f172a] font-medium">
-                    {item.description}
+        {/* Items Table */}
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
+          <div className="bg-white rounded-xl border border-[#e2e8f0] shadow-sm overflow-hidden">
+            <table className="w-full text-left">
+              <thead className="bg-[#f8fafc] border-b border-[#e2e8f0]">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#64748b]">Descrição</th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-[#64748b]">Qtde</th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-[#64748b]">Unitário</th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-[#64748b]">Total</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#e2e8f0]">
+                {proposal.items.map((item, index) => (
+                  <tr key={item.id} className="hover:bg-[#f8fafc]">
+                    <td className="px-6 py-4 text-[#0f172a] font-medium">
+                      {item.description}
+                    </td>
+                    <td className="px-6 py-4 text-right text-[#475569]">{item.quantity}</td>
+                    <td className="px-6 py-4 text-right text-[#475569]">
+                      {item.unit_price ? `R$ ${Number(item.unit_price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "—"}
+                    </td>
+                    <td className="px-6 py-4 text-right text-[#475569] font-medium">
+                      {item.unit_price
+                        ? `R$ ${Number(item.unit_price * item.quantity).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
+                        : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot className="bg-[#f8fafc]">
+                <tr>
+                  <td className="px-6 py-4 text-right text-sm font-medium text-[#0f172a]" colSpan={3}>
+                    Total
                   </td>
-                  <td className="px-6 py-4 text-right text-[#475569]">{item.quantity}</td>
-                  <td className="px-6 py-4 text-right text-[#475569]">
-                    {item.unit_price ? `R$ ${Number(item.unit_price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "—"}
-                  </td>
-                  <td className="px-6 py-4 text-right text-[#475569] font-medium">
-                    {item.unit_price
-                      ? `R$ ${Number(item.unit_price * item.quantity).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
-                      : "—"}
+                  <td className="px-6 py-4 text-right text-xl font-bold text-[#0f172a]">
+                    {total ? `R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "—"}
                   </td>
                 </tr>
-              ))}
-            </tbody>
-            <tfoot className="bg-[#f8fafc]">
-              <tr>
-                <td className="px-6 py-4 text-right text-sm font-medium text-[#0f172a]" colSpan="3">
-                  Total
-                </td>
-                <td className="px-6 py-4 text-right text-xl font-bold text-[#0f172a]">
-                  {total ? `R$ ${total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "—"}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-  
-
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </main>
 
       {/* Footer */}
       <footer className="bg-[#0f172a] text-white py-8 px-6 sm:px-8 lg:px-12 mt-12">
@@ -271,11 +273,11 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
           <div className="flex items-center gap-3 mb-4 md:mb-0">
             <img src="/logo.png" alt="Mavox" className="h-6" />
             <span className="font-bold text-lg">Mavox</span>
-    
+          </div>
           <p className="text-[#94a3b8] text-sm">
             Desenvolvendo soluções digitais que impulsionam negócios.
           </p>
-  
+        </div>
       </footer>
     </div>
   );
