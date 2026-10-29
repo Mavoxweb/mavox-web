@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Lock, Mail, AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
-import { signIn, getAuthCookieName } from "@/lib/auth";
+import { signIn } from "@/lib/auth";
 import Link from "next/link";
 
 export default function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams?.get("redirect") || "/painel/dashboard";
+  const redirect = searchParams?.get("redirect");
+  const redirectPath = redirect && redirect.startsWith("/painel") ? redirect : "/painel/dashboard";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,8 +26,10 @@ export default function LoginForm() {
     setLoading(false);
 
     if (result.ok) {
-      router.push(redirect);
-      router.refresh();
+      // Definir o cookie de sessão já é feito pela API, agora navegamos para o dashboard
+      // Usamos window.location.href para garantir a navegação completa e recarregar a página
+      // com o cookie de sessão já definido pelo servidor
+      window.location.href = redirectPath;
     } else {
       setError(result.error || "E-mail ou senha inválidos");
     }
