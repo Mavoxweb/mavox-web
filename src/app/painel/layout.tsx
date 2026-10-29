@@ -73,8 +73,8 @@ export default function AdminLayout({
     } catch {
       // Ignorar erro de rede
     }
-    document.cookie = "neon_auth_session=; path=/; max-age=0";
-    window.location.href = "/painel/login";
+    document.cookie = "mavox_session=; path=/; max-age=0";
+    window.location.href = "/login";
   };
 
   const wrapperClass = `min-h-screen flex transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-gray-50"}`;

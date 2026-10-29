@@ -25,12 +25,11 @@ export default function LoginForm() {
     const result = await signIn(email, password);
     setLoading(false);
 
-    if (result) {
-      document.cookie = `${getAuthCookieName()}=${result.token}; path=/; max-age=604800; SameSite=Lax${process.env.NODE_ENV === "production" ? "; Secure" : ""}`;
+    if (result.ok) {
       router.push(redirect);
       router.refresh();
     } else {
-      setError("E-mail ou senha inválidos");
+      setError(result.error || "E-mail ou senha inválidos");
     }
   };
 

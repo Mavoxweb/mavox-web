@@ -1,68 +1,53 @@
-import { createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
-
-export interface AuthUser extends JWTPayload {
-  sub: string;
+export interface AuthUser {
+  id: string;
   email: string;
   name?: string;
   role?: string;
-  emailVerified?: boolean;
 }
 
-let JWKS: ReturnType<typeof createRemoteJWKSet> | null = null;
-
-function getJWKS() {
-  if (JWKS) return JWKS;
-  const jwksUrl = process.env.NEON_AUTH_JWKS_URL;
-  if (!jwksUrl) {
-    throw new Error("NEON_AUTH_JWKS_URL não está configurada");
-  }
-  JWKS = createRemoteJWKSet(new URL(jwksUrl));
-  return JWKS;
-}
-
-export async function verifyToken(token: string): Promise<AuthUser | null> {
+// signIn chama nossa própria API que verifica credenciais no banco Neon Auth
+export async function signIn(email: string, password: string): Promise<{ ok: boolean; error?: string }> {
   try {
-    const { payload } = await jwtVerify(token, getJWKS(), {
-      issuer: process.env.NEON_AUTH_BASE_URL,
+    const res = await fetch("/api/auth/signin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      credentials: "include",
     });
-    return payload as unknown as AuthUser;
-  } catch {
-    return null;
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return { ok: false, error: data.error || "E-mail ou senha inválidos" };
+    }
+
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: "Erro de conexão com o servidor" };
   }
 }
 
-// signIn NÃO precisa verificar o token via JWKS — o Neon Auth já retorna um token válido.
-// A verificação server-side é feita pelo middleware.
-export async function signIn(email: string, password: string): Promise<{ token: string; user: Partial<AuthUser> } | null> {
-  const baseUrl = process.env.NEON_AUTH_BASE_URL;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  if (!baseUrl) return null;
+export async function signUp(email: string, password: string, name: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch("/api/auth/signin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, name }),
+      credentials: "include",
+    });
 
-  const res = await fetch(`${baseUrl}/sign-in/email`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Origin: siteUrl || "" },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.token ? { token: data.token, user: data.user || {} } : null;
-}
+    const data = await res.json();
 
-export async function signUp(email: string, password: string, name: string): Promise<{ token: string; user: Partial<AuthUser> } | null> {
-  const baseUrl = process.env.NEON_AUTH_BASE_URL;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  if (!baseUrl) return null;
+    if (!res.ok) {
+      return { ok: false, error: data.error || "Erro ao criar usuário" };
+    }
 
-  const res = await fetch(`${baseUrl}/sign-up/email`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Origin: siteUrl || "" },
-    body: JSON.stringify({ email, password, name }),
-  });
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.token ? { token: data.token, user: data.user || {} } : null;
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: "Erro de conexão com o servidor" };
+  }
 }
 
 export function getAuthCookieName(): string {
-  return "neon_auth_session";
+  return "mavox_session";
 }
