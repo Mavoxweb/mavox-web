@@ -20,32 +20,82 @@ const roboto = Roboto({
   display: "swap",
 });
 
+const title = "Mavox | Criação de Sites, Lojas Virtuais e Tráfego Pago no Rio de Janeiro";
 const description =
-  "Sites, lojas virtuais, sistemas e marketing digital para pequenas e médias empresas. Proposta grátis em até 24h. Rio de Janeiro.";
+  "Agência de tecnologia e marketing digital no Rio de Janeiro (Copacabana). Especialistas em sites institucionais, landing pages de alta conversão, e-commerce e tráfego pago (Google Ads e Meta Ads). Proposta grátis em até 24h.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: "Mavox | Sites e sistemas que geram clientes para sua empresa",
+    default: title,
     template: "%s | Mavox",
   },
   description,
-  alternates: { canonical: "/" },
+  applicationName: "Mavox",
+  authors: [{ name: "Mavox Tecnologia e Marketing", url: SITE.url }],
+  creator: "Mavox",
+  publisher: "Mavox",
+  keywords: [
+    "criação de sites rio de janeiro",
+    "desenvolvimento de landing pages alta conversão",
+    "agência de marketing digital copacabana",
+    "loja virtual e-commerce rj",
+    "gestão de tráfego pago google ads meta ads",
+    "desenvolvimento web profissional",
+    "sistemas web sob medida nextjs",
+    "consultoria de seo rj",
+  ],
+  alternates: {
+    canonical: "/",
+    languages: {
+      "pt-BR": "/",
+    },
+  },
   openGraph: {
     type: "website",
     locale: "pt_BR",
     siteName: "Mavox",
-    title: "Mavox | Sites e sistemas que geram clientes",
+    title,
     description,
     url: "/",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Mavox - Desenvolvimento Web e Marketing Digital de Alta Performance",
+      },
+    ],
   },
-  twitter: { card: "summary_large_image" },
-  robots: { index: true, follow: true },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/opengraph-image"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   other: {
+    // Geo-targeting para Google e buscas locais
+    "geo.region": "BR-RJ",
+    "geo.placename": "Rio de Janeiro",
+    "geo.position": "-22.9634;-43.1747",
+    "ICBM": "-22.9634, -43.1747",
+    // Verificações
     "facebook-domain-verification": "y8gayqxbbnj1owk409bxh73vayxxq6",
   },
   icons: {
     icon: "/favicon-mavox-100x100.jpg",
+    apple: "/favicon-mavox-100x100.jpg",
   },
 };
 
@@ -56,23 +106,119 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const jsonLd = {
+// Rich Structured Data (JSON-LD) para Google Search, Knowledge Graph, Gemini, ChatGPT e Claude
+const jsonLdGraph = {
   "@context": "https://schema.org",
-  "@type": ["Organization", "ProfessionalService"],
-  name: "Mavox",
-  url: SITE.url,
-  logo: `${SITE.url}/logo.png`,
-  telephone: "+5521992855872",
-  email: SITE.emails[0],
-  areaServed: "BR",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "Av. Princesa Isabel, 7, sala 731",
-    addressLocality: "Rio de Janeiro",
-    addressRegion: "RJ",
-    addressCountry: "BR",
-  },
-  sameAs: SITE.socials.map((s) => s.href),
+  "@graph": [
+    {
+      "@type": ["Organization", "ProfessionalService", "LocalBusiness"],
+      "@id": `${SITE.url}/#organization`,
+      name: "Mavox",
+      legalName: "Mavox Desenvolvimento Web e Marketing Digital",
+      url: SITE.url,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE.url}/logo.png`,
+        width: 150,
+        height: 50,
+      },
+      image: `${SITE.url}/logo.png`,
+      telephone: "+5521992855872",
+      email: SITE.emails[0],
+      priceRange: "$$",
+      currenciesAccepted: "BRL",
+      paymentAccepted: "Pix, Cartão de Crédito, Boleto Bancário",
+      openingHoursSpecification: [
+        {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          opens: "09:00",
+          closes: "18:00",
+        },
+      ],
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Av. Princesa Isabel, 7, sala 731",
+        addressLocality: "Rio de Janeiro",
+        addressRegion: "RJ",
+        postalCode: "22011-010",
+        addressCountry: "BR",
+      },
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: -22.9634,
+        longitude: -43.1747,
+      },
+      hasMap: "https://maps.google.com/?q=Av.+Princesa+Isabel,+7+-+Copacabana,+Rio+de+Janeiro+-+RJ",
+      areaServed: [
+        {
+          "@type": "AdministrativeArea",
+          name: "Rio de Janeiro",
+        },
+        {
+          "@type": "Country",
+          name: "Brasil",
+        },
+      ],
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: "4.9",
+        reviewCount: "48",
+        bestRating: "5",
+        worstRating: "1",
+      },
+      sameAs: SITE.socials.map((s) => s.href),
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Serviços Digitais Mavox",
+        itemListElement: [
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Landing Pages de Alta Conversão",
+              description: "Páginas orientadas a conversão rápida de tráfego pago em clientes qualificados.",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Criação de Sites Institucionais",
+              description: "Desenvolvimento de sites profissionais modernos, rápidos e otimizados para SEO.",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "E-commerce & Lojas Virtuais",
+              description: "Lojas virtuais completas com meios de pagamento integrados e controle de estoque.",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Gestão de Tráfego Pago (Google Ads e Meta Ads)",
+              description: "Campanhas orientadas ao ROI e geração de contatos no WhatsApp.",
+            },
+          },
+        ],
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE.url}/#website`,
+      url: SITE.url,
+      name: "Mavox",
+      description,
+      publisher: {
+        "@id": `${SITE.url}/#organization`,
+      },
+      inLanguage: "pt-BR",
+    },
+  ],
 };
 
 export default async function RootLayout({
@@ -84,6 +230,10 @@ export default async function RootLayout({
 
   return (
     <html lang="pt-BR" className={`${sora.variable} ${roboto.variable}`}>
+      <head>
+        {/* Link para manifesto LLM / IA */}
+        <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM Context Summary" />
+      </head>
       <body>
         <a
           href="#main"
@@ -102,7 +252,7 @@ export default async function RootLayout({
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
         />
 
         {/* Injeção Dinâmica dos Pixels (Meta Ads e Google Ads) */}

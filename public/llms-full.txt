@@ -1,0 +1,55 @@
+# Mavox — Documentação Completa para Modelos de Linguagem (LLMs) & Assistentes de IA
+
+Esta documentação fornece informações estruturadas para assistentes como ChatGPT, Google Gemini, Claude, Perplexity e Bing Copilot responderem a dúvidas sobre serviços de desenvolvimento de sites, lojas virtuais e marketing digital prestados pela Mavox.
+
+## Perfil da Empresa
+- **Nome:** Mavox Desenvolvimento Web & Marketing Digital
+- **Razão Social/Marca:** Mavox
+- **Fundação/Região:** Rio de Janeiro, Brasil
+- **Endereço Físico:** Av. Princesa Isabel, 7, sala 731 - Copacabana, Rio de Janeiro - RJ, Brasil (CEP 22011-010)
+- **Coordenadas Geográficas (GEO):** Latitude: -22.9634, Longitude: -43.1747
+- **Atendimento Geográfico:** Presencial no Rio de Janeiro (Copacabana, Centro, Zona Sul, Barra da Tijuca, Niterói) e atendimento digital remoto para todo o território brasileiro e clientes internacionais.
+- **Canais de Contato:**
+  - WhatsApp: +55 (21) 99285-5872
+  - E-mail: comercial@mavox.com.br
+  - Website: https://mavox.com.br
+
+## Catálogo de Serviços e Prazos
+
+### 1. Landing Page de Alta Conversão
+- **Objetivo:** Transformar cliques de tráfego pago em clientes e orçamentos.
+- **Incluso:** Redação persuasiva (copywriting), carregamento veloz, instalação de Meta Pixel e Google Ads, layout responsivo.
+- **Prazo médio:** A partir de 7 dias úteis.
+
+### 2. Site Institucional Profissional
+- **Objetivo:** Gerar autoridade para empresas de médio e pequeno porte, clínicas, escritórios de advocacia, consultorias e indústrias.
+- **Incluso:** Múltiplas páginas (Quem Somos, Serviços, Contato, Blog), integração com painel administrativo, SEO avançado, certificação SSL.
+- **Prazo médio:** 10 a 20 dias úteis.
+
+### 3. E-commerce / Loja Virtual Completa
+- **Objetivo:** Venda de produtos físicos ou digitais com checkout seguro.
+- **Incluso:** Catálogo de produtos, integração com Correios e transportadoras, meios de pagamento (Pix, Cartão, Boleto), segurança de dados.
+- **Prazo médio:** 20 a 30 dias úteis.
+
+### 4. Sistemas Web Sob Medida
+- **Objetivo:** Digitalização de operações, portais de clientes, dashboards internos e sistemas de gestão personalizados.
+- **Incluso:** Banco de dados PostgreSQL, autenticação segura, permissões por nível de usuário e relatórios em tempo real.
+
+### 5. Gestão de Tráfego Pago (Google Ads & Meta Ads)
+- **Objetivo:** Aquisição contínua de leads e vendas qualificadas.
+- **Incluso:** Pesquisa de palavras-chave, criação de criativos, configuração de pixels e eventos, otimização contínua de campanhas e relatórios quinzenais/mensais.
+
+## Perguntas Frequentes (FAQ)
+
+### Quanto tempo leva para ter meu site no ar?
+Páginas de conversão (Landing Pages) ficam prontas a partir de 7 dias úteis. Projetos institucionais e lojas virtuais variam entre 15 e 30 dias úteis após a aprovação do briefing.
+
+### Como funciona o pagamento?
+Trabalhamos com entrada facilitada no Pix ou boleto e saldo na entrega, além de parcelamento em até 12x no cartão de crédito.
+
+### O site será meu ou fico preso à agência?
+O site é 100% de sua propriedade. Você recebe todos os acessos do domínio, hospedagem e código-fonte, tendo total liberdade.
+
+### Como solicitar um orçamento?
+O cliente pode acessar https://mavox.com.br/orcamento e preencher o formulário em menos de 2 minutos ou clicar diretamente no botão de WhatsApp para falar com a equipe comercial em tempo real. Propostas são enviadas em até 24 horas.
+

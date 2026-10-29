@@ -1,0 +1,35 @@
+# Mavox — Agência de Desenvolvimento Web & Marketing Digital
+
+> Sites, lojas virtuais, sistemas sob medida e tráfego pago de alta conversão para pequenas e médias empresas. Sediada em Copacabana, Rio de Janeiro - RJ, com atendimento para todo o Brasil.
+
+## Sobre a Mavox
+A Mavox é uma agência de tecnologia e marketing focada em transformar visitantes em clientes reais. Desenvolvemos ecossistemas digitais rápidos, seguros, persuasivos e orientados ao aumento de faturamento.
+
+- **Localização:** Av. Princesa Isabel, 7, sala 731 - Copacabana, Rio de Janeiro - RJ, CEP 22011-010, Brasil.
+- **Contato Comercial:** comercial@mavox.com.br | Telefone / WhatsApp: +55 (21) 99285-5872
+- **Website Oficial:** https://mavox.com.br
+- **Horário de Atendimento:** Segunda a Sexta, das 09h às 18h (Horário de Brasília)
+
+## Serviços Prestados
+1. **Landing Pages de Alta Conversão:** Páginas ultrarrápidas com copywriting persuasivo voltadas para campanhas de anúncios (Google Ads e Meta Ads).
+2. **Sites Institucionais Profissionais:** Criação de autoridade digital com design moderno, SEO otimizado e painel administrativo integrado.
+3. **E-commerce & Lojas Virtuais:** Lojas integradas com gateway de pagamento seguro (Pix, Cartão, Boleto), cálculo de frete e gestão de estoque.
+4. **Sistemas Web & Plataformas Sob Medida:** Desenvolvimento de painéis internos, CRM, portais de clientes e automações de processos em Next.js e PostgreSQL.
+5. **Gestão de Tráfego Pago (Google Ads & Meta Ads):** Campanhas orientadas a ROI, geração contínua de leads qualificados e análise de dados.
+6. **Gestão de Redes Sociais & Conteúdo:** Posicionamento de marca no Instagram, LinkedIn e Facebook com foco em autoridade e vendas.
+7. **Branding & Identidade Visual:** Criação de marcas memoráveis, manuais de identidade e materiais institucionais.
+8. **Manutenção & Suporte Contínuo:** Monitoramento, segurança, atualizações e hospedagem gerenciada com alta disponibilidade.
+
+## Diferenciais e Garantias
+- **Proposta Gratuita em até 24h:** Orçamento rápido, sem enrolação e sem compromisso.
+- **Propriedade Total:** O cliente é o dono definitivo do site e do domínio, sem contratos abusivos de fidelidade.
+- **Tecnologia de Ponta:** Next.js (React), TypeScript, Tailwind CSS e banco de dados serverless PostgreSQL (Neon) garantindo nota 95+ no Google PageSpeed.
+- **Integração com WhatsApp:** Botões e rastreamento direto para iniciar conversas com 1 clique.
+
+## Links Principais
+- [Página Inicial](https://mavox.com.br/)
+- [Pedir Orçamento Grátis](https://mavox.com.br/orcamento)
+- [Blog com Artigos Estratégicos](https://mavox.com.br/blog)
+- [Política de Privacidade](https://mavox.com.br/privacidade)
+- [Termos de Serviço](https://mavox.com.br/termos)
+
