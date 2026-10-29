@@ -22,7 +22,7 @@ export default function NewPostPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
-  const [models, setModels] = useState<OpenRouterModel[]>([]);
+  const [models, setModels] = useState<OpenRouterModelData[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>("");
   const [formData, setFormData] = useState({
     title: "",
@@ -94,7 +94,7 @@ export default function NewPostPage() {
         }),
       });
 
-      const data: { content?: string } = await res.json();
+      const data: { content?: string; error?: string } = await res.json();
 
       if (!res.ok) {
         setError(data.error || "Erro ao gerar texto com IA");

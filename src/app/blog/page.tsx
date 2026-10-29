@@ -29,7 +29,7 @@ export default function BlogPage() {
                     {post.status}
                   </span>
                   <span className="text-xs text-[#64748b] dark:text-[#94a3b8]">
-                    {new Date(post.published_at || post.created_at).toLocaleDateString("pt-BR")}
+                    {new Date(post.published_at).toLocaleDateString("pt-BR")}
                   </span>
                 </div>
                 <h2 className="text-xl font-bold text-[#0f172a] dark:text-[#f1f5f9] mb-2 line-clamp-2">{post.title}</h2>
