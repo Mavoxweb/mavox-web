@@ -173,10 +173,65 @@ CREATE TABLE settings (
   whatsapp_number text,
   meta_pixel_id text,
   google_ads_id text,
+  -- SMTP (Fase 2)
+  smtp_host text,
+  smtp_port int DEFAULT 587,
+  smtp_user text,
+  smtp_password text,
+  smtp_secure boolean DEFAULT false,
+  smtp_from_name text,
+  smtp_from_email text,
+  -- IA (Fase 2)
+  ai_models jsonb NOT NULL DEFAULT '{}'::jsonb,
+  daily_agent_model text,
+  daily_agent_enabled boolean NOT NULL DEFAULT true,
+  daily_agent_last_run timestamptz,
   updated_at timestamptz DEFAULT now()
+);
+
+-- Templates de e-mail (Fase 2)
+CREATE TABLE email_templates (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  key text UNIQUE NOT NULL,
+  name text NOT NULL,
+  subject text NOT NULL,
+  body_html text NOT NULL,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Logs de envio de e-mail (Fase 2)
+CREATE TABLE email_logs (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  to_email text NOT NULL,
+  subject text NOT NULL,
+  template_key text,
+  status text NOT NULL,
+  error text,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Oportunidades do agente diário (Fase 2)
+CREATE TABLE ai_opportunities (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  run_date date NOT NULL DEFAULT CURRENT_DATE,
+  title text NOT NULL,
+  description text NOT NULL,
+  category text NOT NULL DEFAULT 'geral',
+  priority text NOT NULL DEFAULT 'media',
+  related_type text,
+  related_id uuid,
+  action_url text,
+  action_label text,
+  source text NOT NULL DEFAULT 'regra',
+  status text NOT NULL DEFAULT 'aberta',
+  created_at timestamptz NOT NULL DEFAULT now()
 );
 
 -- Índices adicionais para performance
 CREATE INDEX proposals_token_idx ON proposals (public_token);
 CREATE INDEX proposals_quote_idx ON proposals (quote_id);
 CREATE INDEX quote_events_quote_idx ON quote_events (quote_id);
+CREATE INDEX email_logs_created_idx ON email_logs (created_at DESC);
+CREATE INDEX email_logs_status_idx ON email_logs (status);
+CREATE INDEX ai_opportunities_run_idx ON ai_opportunities (run_date DESC);
+CREATE INDEX ai_opportunities_status_idx ON ai_opportunities (status);

@@ -59,14 +59,23 @@ export default function NewPostPage() {
           const modelsData = await modelsRes.json();
           setModels(
             modelsData.data
-              .filter((m: OpenRouterModelData) => m.id.includes("openai/") || m.id.includes("anthropic/") || m.id.includes("google/"))
-              .slice(0, 20)
+              .filter((m: OpenRouterModelData) => {
+                const id = m.id;
+                return (
+                  id.includes(":free") ||
+                  id.includes("nemotron") ||
+                  id.includes("openai/") ||
+                  id.includes("anthropic/") ||
+                  id.includes("google/")
+                );
+              })
+              .slice(0, 60)
               .map((m: OpenRouterModelData) => ({
                 id: m.id,
                 name: m.name || m.id,
               }))
           );
-          setSelectedModel(modelsData.data[0]?.id || "openai/gpt-3.5-turbo");
+          setSelectedModel(data.ai_models?.blog_writer || modelsData.data[0]?.id || "");
         }
       }
     } catch (err) {
@@ -92,6 +101,7 @@ export default function NewPostPage() {
           trending_topic: formData.trending_topic,
           mavox_data: "Agência de desenvolvimento web, sites institucionais, e-commerce, sistemas sob medida, tráfego pago, branding e manutenção",
           objective: formData.ai_objective || "Gerar leads e vendas para a Mavox",
+          model: selectedModel || undefined,
         }),
       });
 

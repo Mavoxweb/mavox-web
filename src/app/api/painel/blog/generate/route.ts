@@ -1,30 +1,54 @@
 import { NextResponse } from "next/server";
+import { queryOne } from "@/lib/db";
+import { callOpenRouter, resolveModel } from "@/lib/ai";
 
-interface OpenRouterMessage {
-  role: string;
-  content: string;
+interface GenerateBody {
+  trending_topic?: string;
+  mavox_data?: string;
+  objective?: string;
+  model?: string;
 }
 
-interface OpenRouterChoice {
-  message: {
-    content: string;
-  };
+interface SettingsRow {
+  openrouter_api_key: string | null;
+  ai_models: Record<string, string> | string | null;
 }
 
-interface OpenRouterResponse {
-  choices?: OpenRouterChoice[];
+function parseModels(value: SettingsRow["ai_models"]): Record<string, string> | null {
+  if (!value) return null;
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
+    }
+  }
+  return value;
 }
 
 export async function POST(request: Request) {
   try {
-    const body: { trending_topic?: string; mavox_data?: string; objective?: string } = (await request.json()) as { trending_topic?: string; mavox_data?: string; objective?: string };
-    const { trending_topic, mavox_data, objective } = body;
+    const body: GenerateBody = (await request.json()) as GenerateBody;
+    const { trending_topic, mavox_data, objective, model } = body;
 
-    const openrouterApiKey = process.env.OPENROUTER_API_KEY;
+    let settings: SettingsRow | null = null;
+    try {
+      settings = await queryOne<SettingsRow>(
+        `SELECT openrouter_api_key, ai_models FROM settings WHERE id = 1`
+      );
+    } catch {
+      settings = null;
+    }
+
+    const openrouterApiKey =
+      settings?.openrouter_api_key || process.env.OPENROUTER_API_KEY || "";
 
     if (!openrouterApiKey) {
       return NextResponse.json(
-        { error: "OpenRouter API key não configurada. Acesse /painel/settings para configurar." },
+        {
+          error:
+            "OpenRouter API key não configurada. Acesse /painel/settings › IA & Agente para configurar.",
+        },
         { status: 400 }
       );
     }
@@ -33,6 +57,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Trending topic é obrigatório" }, { status: 400 });
     }
 
+    const selectedModel =
+      model || resolveModel(parseModels(settings?.ai_models ?? null), "blog_writer");
+
     const prompt = `
 Você é um redator especialista em marketing digital e copywriting para a Mavox, uma agência de desenvolvimento web e marketing digital.
 
@@ -40,7 +67,7 @@ TAREFA: Escreva um artigo de blog otimizado para SEO e conversão.
 
 TRÊNDING TOPIC: ${trending_topic}
 OBJETIVO: ${objective || "Gerar leads e vendas para a Mavox"}
-DADOS DA MAVOX: ${mavox_data || "Agência de desenvolvimento web, sites institucionais, e-commerce, tráfego pago, branding e manutenção"}
+DADOS DA MAVOX: ${mavox_data || "Agência de desenvolvimento web, sites institucionais, e-commerce, sistemas sob medida, tráfego pago, branding e manutenção"}
 
 INSTRUÇÕES:
 1. Escreva um artigo completo com 800-1200 palavras
@@ -64,44 +91,29 @@ Estrutura:
 
 Escreva apenas o conteúdo do artigo em markdown.`;
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${openrouterApiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://mavox-web-ten.vercel.app",
-        "X-Title": "Mavox Blog AI",
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: "Você é um redator especialista em marketing digital e copywriting."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        max_tokens: 3000,
-        temperature: 0.7,
-      }),
+    const result = await callOpenRouter({
+      apiKey: openrouterApiKey,
+      model: selectedModel,
+      temperature: 0.7,
+      maxTokens: 3000,
+      messages: [
+        {
+          role: "system",
+          content: "Você é um redator especialista em marketing digital e copywriting.",
+        },
+        { role: "user", content: prompt },
+      ],
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("OpenRouter error:", errorText);
+    if (!result.ok) {
+      console.error("OpenRouter error:", result.error);
       return NextResponse.json(
-        { error: "Erro ao gerar conteúdo com IA" },
-        { status: 500 }
+        { error: `Erro ao gerar conteúdo com IA: ${result.error ?? "desconhecido"}` },
+        { status: 502 }
       );
     }
 
-    const data: OpenRouterResponse = await response.json();
-    const generatedContent = data.choices?.[0]?.message?.content || "";
-
-    return NextResponse.json({ content: generatedContent });
+    return NextResponse.json({ content: result.content, model: selectedModel });
   } catch (error) {
     console.error("AI generation error:", error);
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 });

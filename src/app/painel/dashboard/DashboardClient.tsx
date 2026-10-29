@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { DashboardMetrics } from "@/app/painel/dashboard/components/MetricsCards";
+import OpportunitiesPanel from "@/app/painel/dashboard/components/OpportunitiesPanel";
 import Link from "next/link";
 import {
   UserPlus,
@@ -154,6 +155,9 @@ export default function DashboardClient({ metrics }: DashboardClientProps) {
 
       {/* KPI Cards Grid */}
       <DashboardMetrics metrics={metrics} />
+
+      {/* Agente diário de oportunidades */}
+      <OpportunitiesPanel />
 
       {/* Main Grid Sections */}
       <div className="painel-g">

@@ -283,10 +283,10 @@ CREATE TABLE client_reports (
 - [ ] UX01-UX10 (sidebar, dashboard modal, importação, kanban fix)
 - [ ] Deploy hotfix
 
-### Semana 3-4: Configurações & IA (Fase 2)
-- [ ] CFG01-CFG03 (SMTP + templates)
-- [ ] CFG04-CFG07 (OpenRouter validação + Agente Diário)
-- [ ] Tags iniciais + seed no banco
+### Semana 3-4: Configurações & IA (Fase 2) ✅ CONCLUÍDA
+- [x] CFG01-CFG03 (SMTP + templates)
+- [x] CFG04-CFG07 (OpenRouter validação + Agente Diário)
+- [x] Tags iniciais + seed no banco
 
 ### Semana 5-6: Blog & Pixels (Fase 3 + 4)
 - [ ] BLG01-BLG08 (Editor rico + IA + CTAs + SEO)

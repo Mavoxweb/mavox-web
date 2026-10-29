@@ -3,11 +3,18 @@
     {
       "path": "/api/cron/publish-posts",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/daily-agent",
+      "schedule": "0 3 * * *"
     }
   ],
   "functions": {
     "src/app/api/**/*.ts": {
       "maxDuration": 30
+    },
+    "src/app/api/cron/daily-agent/route.ts": {
+      "maxDuration": 60
     }
   },
   "headers": [
