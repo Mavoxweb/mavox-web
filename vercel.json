@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/publish-posts",
-      "schedule": "*/5 * * * *"
+      "schedule": "5 3 * * *"
     },
     {
       "path": "/api/cron/daily-agent",

@@ -20,7 +20,8 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
               COALESCE(published_at, created_at) as published_at, 
               ai_generated, created_at 
        FROM posts 
-       WHERE status = 'published' AND (published_at IS NULL OR published_at <= NOW())
+       WHERE (status = 'published' AND (published_at IS NULL OR published_at <= NOW()))
+          OR (status = 'scheduled' AND published_at IS NOT NULL AND published_at <= NOW())
        ORDER BY published_at DESC, created_at DESC`
     );
 
@@ -48,7 +49,11 @@ export async function getPublishedPostBySlug(slug: string): Promise<BlogPost | n
               COALESCE(published_at, created_at) as published_at, 
               ai_generated, created_at 
        FROM posts 
-       WHERE slug = $1 AND (status = 'published' OR status = 'draft')
+       WHERE slug = $1
+         AND (
+           (status = 'published' AND (published_at IS NULL OR published_at <= NOW()))
+           OR (status = 'scheduled' AND published_at IS NOT NULL AND published_at <= NOW())
+         )
        LIMIT 1`,
       [slug]
     );

@@ -7,6 +7,10 @@ export const metadata: Metadata = {
   description: "Artigos práticos sobre desenvolvimento de sites de alta conversão, e-commerce, tráfego pago e automação de vendas para empresas.",
 };
 
+// Revalida a listagem a cada 60s para refletir posts agendados que venceram,
+// sem depender de cron a cada 5 minutos (indisponível no plano Hobby).
+export const revalidate = 60;
+
 export default async function BlogPage() {
   const posts = await getPublishedPosts();
 
