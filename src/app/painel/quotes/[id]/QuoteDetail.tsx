@@ -86,10 +86,10 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
     setLoading(true);
     try {
       const [quoteRes, itemsRes, eventsRes, clientsRes] = await Promise.all([
-        fetch(`/api/painel/quotes/${quoteId}`),
-        fetch(`/api/painel/quotes/${quoteId}/items`),
-        fetch(`/api/painel/quotes/${quoteId}/events`),
-        fetch("/api/painel/clients?limit=100"),
+        fetch(`/api/painel/quotes/${quoteId}`, { credentials: 'include' }),
+        fetch(`/api/painel/quotes/${quoteId}/items`, { credentials: 'include' }),
+        fetch(`/api/painel/quotes/${quoteId}/events`, { credentials: 'include' }),
+        fetch("/api/painel/clients?limit=100", { credentials: 'include' }),
       ]);
 
       if (!quoteRes.ok) throw new Error("Orçamento não encontrado");
@@ -132,7 +132,7 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
   }, [quoteId]);
 
   const fetchItems = async () => {
-    const res = await fetch(`/api/painel/quotes/${quoteId}/items`);
+    const res = await fetch(`/api/painel/quotes/${quoteId}/items`, { credentials: 'include' });
     if (res.ok) {
       const data = await res.json();
       setItems(data.data || data || []);
@@ -148,6 +148,7 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
       const res = await fetch(`/api/painel/quotes/${quoteId}/items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({
           description: newItem.description,
           quantity: newItem.quantity,
@@ -178,6 +179,7 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
     try {
       const res = await fetch(`/api/painel/quotes/${quoteId}/items?itemId=${itemId}`, {
         method: "DELETE",
+        credentials: 'include',
       });
       if (!res.ok) throw new Error("Erro ao remover item");
       const data = await res.json();

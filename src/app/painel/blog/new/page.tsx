@@ -43,7 +43,7 @@ export default function NewPostPage() {
 
   const fetchModels = async () => {
     try {
-      const res = await fetch("/api/settings");
+      const res = await fetch("/api/painel/settings");
       const data = await res.json();
       if (data.openrouter_api_key) {
         setApiKeyConfigured(true);
@@ -150,31 +150,32 @@ export default function NewPostPage() {
     }
   };
 
-  if (!apiKeyConfigured) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-[#0f172a] flex items-center justify-center">
-        <div className="bg-white dark:bg-[#1e293b] rounded-xl border border-[#e2e8f0] dark:border-[#334155] p-8 max-w-md w-full">
-          <div className="flex items-center gap-2 mb-4">
-            <SettingsIcon className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
-            <h2 className="text-xl font-bold text-[#0f172a] dark:text-[#f1f5f9]">Configuração necessária</h2>
-          </div>
-          <p className="text-[#64748b] dark:text-[#94a3b8] mb-6">
-            Configure a chave da OpenRouter API em Configurações antes de criar artigos com IA.
-          </p>
-          <Link
-            href="/painel/settings"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <SettingsIcon className="w-4 h-4" />
-            Acessar Configurações
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  // Removido bloqueio total - editor manual sempre disponível
+  // A geração com IA será desabilitada se não houver API key
 
   return (
     <div className="space-y-6">
+      {/* Warning banner if no API key */}
+      {!apiKeyConfigured && (
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
+          <div className="flex items-center gap-3">
+            <SettingsIcon className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
+                Chave da OpenRouter API não configurada
+              </p>
+              <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-0.5">
+                A geração de artigos com IA está desabilitada. Configure a chave em{" "}
+                <Link href="/painel/settings" className="underline hover:text-yellow-600 dark:hover:text-yellow-400">
+                  Configurações
+                </Link>
+                {" para usar o recurso."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/painel/blog" className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">

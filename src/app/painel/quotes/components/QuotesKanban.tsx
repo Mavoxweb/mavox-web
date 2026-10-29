@@ -56,7 +56,7 @@ export function QuotesKanban() {
   const fetchQuotes = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/painel/quotes?limit=200");
+      const res = await fetch("/api/painel/quotes?limit=200", { credentials: 'include' });
       const data = await res.json();
 
       const grouped: Record<string, Quote[]> = {};
@@ -100,6 +100,7 @@ export function QuotesKanban() {
       const res = await fetch(`/api/painel/quotes/${quoteData.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({ status: newStatus }),
       });
 

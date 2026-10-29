@@ -100,14 +100,18 @@ export default function AdminLayout({
       <aside className="painel-aside" aria-label="Navegação principal">
         {/* Brand */}
         <div className="painel-brand">
-          <div className="painel-logo">M</div>
+          <img 
+            src="/Logo MAVOX Verde Vibrante.png" 
+            alt="Mavox" 
+            className="painel-logo-img" 
+          />
           <div className="lbl">
             <b>Mavox CRM</b>
             <small>Painel Administrativo</small>
           </div>
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="painel-tg lbl"
+            className="painel-tg"
             aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
             title={collapsed ? "Expandir" : "Recolher"}
           >
@@ -121,7 +125,11 @@ export default function AdminLayout({
 
         {/* User Card */}
         <div className="painel-user">
-          <div className="painel-av">AD</div>
+          <img 
+            src="/alex.jpg" 
+            alt="Admin Mavox" 
+            className="painel-avatar" 
+          />
           <div className="painel-user-info lbl">
             <b>Admin Mavox</b>
             <span>contato@mavox.com.br</span>
