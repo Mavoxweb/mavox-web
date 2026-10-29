@@ -21,7 +21,20 @@ export async function saveQuoteRequest(input: QuoteRequest): Promise<{ id: strin
     );
     const leadId = leadResult.rows[0].id;
 
-    // 2. Gerar código e criar orçamento
+    // 2. Criar/atualizar client unificado (source='site', intent='conhecer')
+    await client.query(
+      `INSERT INTO clients (id, name, email, phone, company, source, intent) 
+       VALUES (gen_random_uuid(), $1, $2, $3, $4, 'site', 'conhecer')
+       ON CONFLICT (email) DO UPDATE SET
+         name = EXCLUDED.name,
+         phone = EXCLUDED.phone,
+         company = EXCLUDED.company,
+         source = CASE WHEN clients.source = 'manual' THEN 'manual' ELSE EXCLUDED.source END
+       RETURNING id`,
+      [input.name, input.email, input.phone, input.company]
+    );
+
+    // 3. Gerar código e criar orçamento
     const code = generateCode();
     const quoteResult = await client.query<{ id: string }>(
       `INSERT INTO quotes (id, code, lead_id, status, briefing, budget_range, deadline_pref, total, valid_until) VALUES (gen_random_uuid(), $1, $2, 'novo', $3, $4, $5, 0, CURRENT_DATE + INTERVAL '30 days') RETURNING id`,
@@ -29,7 +42,7 @@ export async function saveQuoteRequest(input: QuoteRequest): Promise<{ id: strin
     );
     const quoteId = quoteResult.rows[0].id;
 
-    // 3. Inserir itens do orçamento
+    // 4. Inserir itens do orçamento
     for (let i = 0; i < input.services.length; i++) {
       const serviceSlug = input.services[i];
       const service = services.find((s) => s.slug === serviceSlug);

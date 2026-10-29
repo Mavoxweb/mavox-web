@@ -1,38 +1,88 @@
-import { QuotesKanban } from "./components/QuotesKanban";
+"use client";
 
-export default async function QuotesPage() {
+import { useState, useEffect, Suspense } from "react";
+import { QuotesKanban } from "./components/QuotesKanban";
+import { QuotesList } from "./components/QuotesList";
+import { Kanban, List, Plus } from "lucide-react";
+import Link from "next/link";
+
+export default function QuotesPage() {
+  const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("mavox-quotes-view");
+    if (saved === "list" || saved === "kanban") {
+      setViewMode(saved);
+    }
+  }, []);
+
+  const handleToggleView = (mode: "kanban" | "list") => {
+    setViewMode(mode);
+    localStorage.setItem("mavox-quotes-view", mode);
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Orçamentos</h1>
-          <p className="text-gray-600 mt-1">Gerencie o funil de vendas</p>
+          <h2 className="text-xl font-bold tracking-tight" style={{ color: "var(--tx)" }}>
+            Funil de Orçamentos
+          </h2>
+          <p className="text-xs mt-0.5" style={{ color: "var(--mu)" }}>
+            Acompanhe pedidos de orçamentos, altere status e gere propostas com PDF.
+          </p>
+        </div>
+
+        {/* View Mode Toggle */}
+        <div className="flex items-center gap-2">
+          <div
+            className="flex items-center p-1 rounded-xl border"
+            style={{ borderColor: "var(--bd)", background: "var(--side)" }}
+          >
+            <button
+              onClick={() => handleToggleView("kanban")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === "kanban"
+                  ? "bg-white dark:bg-[#181822] shadow-sm text-blue-600 dark:text-blue-400"
+                  : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
+              }`}
+            >
+              <Kanban className="w-3.5 h-3.5" />
+              Kanban
+            </button>
+            <button
+              onClick={() => handleToggleView("list")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === "list"
+                  ? "bg-white dark:bg-[#181822] shadow-sm text-blue-600 dark:text-blue-400"
+                  : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              Lista
+            </button>
+          </div>
+
+          <Link href="/painel/clients/new" className="painel-btn pr">
+            <Plus className="w-4 h-4" />
+            Novo Orçamento
+          </Link>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200">
-        <Tabs />
-        <Suspense fallback={<div className="p-8 text-center animate-pulse text-gray-400">Carregando...</div>}>
-          <QuotesKanban />
+      {/* View Content */}
+      <div className="painel-c p-4 sm:p-6">
+        <Suspense
+          fallback={
+            <div className="p-12 text-center text-xs animate-pulse" style={{ color: "var(--mu)" }}>
+              Carregando orçamentos...
+            </div>
+          }
+        >
+          {viewMode === "kanban" ? <QuotesKanban /> : <QuotesList />}
         </Suspense>
       </div>
     </div>
   );
 }
-
-function Tabs() {
-  return (
-    <div className="border-b border-gray-200 px-6">
-      <nav className="flex gap-8" aria-label="Visualização">
-        <button className="py-4 px-1 border-b-2 border-blue-600 text-blue-600 font-medium text-sm">
-          Kanban
-        </button>
-        <button className="py-4 px-1 border-b-2 border-transparent text-gray-500 font-medium text-sm hover:text-gray-700 hover:border-gray-300">
-          Lista
-        </button>
-      </nav>
-    </div>
-  );
-}
-
-import { Suspense } from "react";

@@ -13,6 +13,8 @@ import {
   Loader2,
   CheckCircle2,
   XCircle,
+  Plus,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -70,7 +72,16 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [proposalToken, setProposalToken] = useState<string | null>(null);
 
+  // Estado do modal de adicionar item
+  const [showAddItemModal, setShowAddItemModal] = useState(false);
+  const [addingItem, setAddingItem] = useState(false);
+  const [newItem, setNewItem] = useState({
+    description: "",
+    quantity: 1,
+    unit_price: 0,
+  });
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -98,6 +109,16 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
       setItems(itemsData.data || itemsData || []);
       setEvents(eventsData.data || eventsData || []);
       setClients(clientsData.data || clientsData || []);
+
+      // Buscar public_token da proposta mais recente
+      const proposalRes = await fetch(`/api/painel/quotes/${quoteId}/proposals`);
+      if (proposalRes.ok) {
+        const proposalData = await proposalRes.json();
+        const proposals = proposalData.data || proposalData || [];
+        if (proposals.length > 0) {
+          setProposalToken(proposals[0].public_token || null);
+        }
+      }
     } catch (err) {
       setError("Erro ao carregar orçamento");
       console.error(err);
@@ -109,6 +130,65 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
   useEffect(() => {
     fetchData();
   }, [quoteId]);
+
+  const fetchItems = async () => {
+    const res = await fetch(`/api/painel/quotes/${quoteId}/items`);
+    if (res.ok) {
+      const data = await res.json();
+      setItems(data.data || data || []);
+    }
+  };
+
+  const handleAddItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newItem.description.trim()) return;
+    setAddingItem(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/painel/quotes/${quoteId}/items`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description: newItem.description,
+          quantity: newItem.quantity,
+          unit_price: newItem.unit_price,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Erro ao adicionar item");
+      }
+      const data = await res.json();
+      // Atualiza total local
+      if (data.total !== undefined) {
+        setQuote(prev => prev ? { ...prev, total: data.total } : null);
+      }
+      await fetchItems();
+      setNewItem({ description: "", quantity: 1, unit_price: 0 });
+      setShowAddItemModal(false);
+    } catch (err: any) {
+      setError(err.message || "Erro ao adicionar item");
+    } finally {
+      setAddingItem(false);
+    }
+  };
+
+  const handleDeleteItem = async (itemId: string) => {
+    if (!confirm("Remover este item?")) return;
+    try {
+      const res = await fetch(`/api/painel/quotes/${quoteId}/items?itemId=${itemId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Erro ao remover item");
+      const data = await res.json();
+      if (data.total !== undefined) {
+        setQuote(prev => prev ? { ...prev, total: data.total } : null);
+      }
+      await fetchItems();
+    } catch (err) {
+      setError("Erro ao remover item");
+    }
+  };
 
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
@@ -184,9 +264,10 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
 
   const handleSendWhatsApp = () => {
     if (!quote) return;
+    const token = proposalToken || quote.id;
     const message = encodeURIComponent(
       `Olá! Sua proposta MVX-${quote.code} está disponível para revisão.\n\n` +
-      `Acesse: ${window.location.origin}/proposta/${quote.id}\n\n` +
+      `Acesse: ${window.location.origin}/proposta/${token}\n\n` +
       `Mavox - Desenvolvimento Web`
     );
     window.open(`https://wa.me/${quote.clientPhone?.replace(/\D/g, "")}?text=${message}`, "_blank");
@@ -194,7 +275,8 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
 
   const handleOpenProposal = () => {
     if (!quote) return;
-    window.open(`/proposta/${quote.id}`, "_blank");
+    const token = proposalToken || quote.id;
+    window.open(`/proposta/${token}`, "_blank");
   };
 
   if (loading) {
@@ -338,10 +420,11 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Itens do Orçamento</h2>
               <button
-                onClick={() => {}}
-                className="px-3 py-2 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                onClick={() => setShowAddItemModal(true)}
+                className="px-3 py-2 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors flex items-center gap-1"
               >
-                + Adicionar Item
+                <Plus className="w-3.5 h-3.5" />
+                Adicionar Item
               </button>
             </div>
 
@@ -487,6 +570,80 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
           </div>
         </div>
       </div>
+
+      {showAddItemModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Novo Item do Orçamento</h3>
+            <form onSubmit={handleAddItem} className="space-y-4">
+              {error && (
+                <div className="text-sm text-red-600 bg-red-50 px-4 py-3 rounded-lg">
+                  {error}
+                </div>
+              )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Descrição *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ex: Desenvolvimento de landing page"
+                  value={newItem.description}
+                  onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Quantidade *</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={newItem.quantity}
+                    onChange={(e) => setNewItem({ ...newItem, quantity: parseInt(e.target.value) || 1 })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Valor Unitário (R$) *</label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    step="0.01"
+                    value={newItem.unit_price}
+                    onChange={(e) => setNewItem({ ...newItem, unit_price: parseFloat(e.target.value) || 0 })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => setShowAddItemModal(false)}
+                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={addingItem}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center gap-2"
+                >
+                  {addingItem ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Adicionando...
+                    </>
+                  ) : (
+                    "Adicionar Item"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
