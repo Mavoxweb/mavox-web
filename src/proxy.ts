@@ -6,7 +6,7 @@ const SECRET_KEY = new TextEncoder().encode(
   process.env.SESSION_SECRET || "mavox-dev-secret-change-in-production-min-32-chars"
 );
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Proteger apenas rotas do painel admin
