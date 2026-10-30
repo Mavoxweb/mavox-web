@@ -271,7 +271,7 @@ export default function BlogEditor({ value, onChange }: BlogEditorProps) {
   const [uploadError, setUploadError] = useState("");
 
   const editor = useEditor({
-    immediatelyRender: false,
+    immediatelyRender: true,
     extensions: [
       StarterKit.configure({
         heading: { levels: [2, 3] },

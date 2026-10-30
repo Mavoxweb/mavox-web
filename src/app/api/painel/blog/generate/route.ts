@@ -91,7 +91,9 @@ export async function POST(request: Request) {
     }
 
     const openrouterApiKey =
-      settings?.openrouter_api_key || process.env.OPENROUTER_API_KEY || "";
+      (settings?.openrouter_api_key && settings.openrouter_api_key.trim()
+        ? settings.openrouter_api_key.trim()
+        : process.env.OPENROUTER_API_KEY || "").trim();
 
     if (!openrouterApiKey) {
       return NextResponse.json(

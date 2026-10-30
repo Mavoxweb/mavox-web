@@ -64,6 +64,14 @@ interface Client {
 }
 
 export function QuoteDetail({ quoteId }: { quoteId: string }) {
+  if (!quoteId || quoteId === "undefined" || quoteId === "null") {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-center">
+        <h2 className="text-xl font-medium text-gray-900">ID de orçamento inválido</h2>
+        <Link href="/painel/quotes" className="mt-4 text-blue-600 hover:text-blue-700 font-medium">Voltar para lista</Link>
+      </div>
+    );
+  }
   const router = useRouter();
   const [quote, setQuote] = useState<Quote | null>(null);
   const [items, setItems] = useState<QuoteItem[]>([]);
