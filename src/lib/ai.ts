@@ -102,7 +102,7 @@ export async function callOpenRouter(
         max_tokens: input.maxTokens ?? 1500,
         ...(input.jsonMode ? { response_format: { type: "json_object" } } : {}),
       }),
-      signal: AbortSignal.timeout(45000),
+      signal: AbortSignal.timeout(25000),
     });
 
     if (!res.ok) {

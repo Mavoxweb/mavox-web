@@ -132,7 +132,14 @@ ${
     : ""
 }`;
 
-    const result = await callOpenRouter({
+    // Fallback models for when primary is slow/unavailable
+    const fallbackModels = [
+      "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "google/gemini-flash-1.5",
+      "openai/gpt-4o-mini",
+    ];
+
+    let result = await callOpenRouter({
       apiKey: openrouterApiKey,
       model: selectedModel,
       temperature: agent === "seo_specialist" ? 0.4 : 0.7,
@@ -142,6 +149,25 @@ ${
         { role: "user", content: userPrompt },
       ],
     });
+
+    // Try fallback models if primary fails due to timeout/rate limit
+    if (!result.ok && (result.error?.includes("timeout") || result.error?.includes("429") || result.error?.includes("503"))) {
+      for (const fallbackModel of fallbackModels) {
+        if (fallbackModel === selectedModel) continue;
+        console.log(`Trying fallback model: ${fallbackModel}`);
+        result = await callOpenRouter({
+          apiKey: openrouterApiKey,
+          model: fallbackModel,
+          temperature: agent === "seo_specialist" ? 0.4 : 0.7,
+          maxTokens: 3800,
+          messages: [
+            { role: "system", content: AGENT_PROMPTS[agent] },
+            { role: "user", content: userPrompt },
+          ],
+        });
+        if (result.ok) break;
+      }
+    }
 
     if (!result.ok) {
       console.error("OpenRouter error:", result.error);

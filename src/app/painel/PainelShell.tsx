@@ -23,6 +23,7 @@ import {
   ExternalLink,
   Sliders,
   Rocket,
+  User,
 } from "lucide-react";
 
 const navigation = [
@@ -125,17 +126,19 @@ export default function PainelShell({
         </div>
 
         {/* User Card */}
-        <div className="painel-user">
-          <img
-            src="/alex.jpg"
-            alt="Admin Mavox"
-            className="painel-avatar"
-          />
-          <div className="painel-user-info lbl">
-            <b>Admin Mavox</b>
-            <span>contato@mavox.com.br</span>
+        <Link href="/painel/usuario" className="painel-user-link" title="Meu Perfil">
+          <div className="painel-user">
+            <img
+              src="/alex.jpg"
+              alt="Admin Mavox"
+              className="painel-avatar"
+            />
+            <div className="painel-user-info lbl">
+              <b>Admin Mavox</b>
+              <span>contato@mavox.com.br</span>
+            </div>
           </div>
-        </div>
+        </Link>
 
         {/* Navigation */}
         <div className="painel-grp lbl">Menu Principal</div>
@@ -180,6 +183,15 @@ export default function PainelShell({
 
         {/* Bottom Options */}
         <div className="painel-nav pt-2" style={{ borderTop: "1px solid var(--bd)" }}>
+          <Link
+            href="/painel/usuario"
+            className="painel-nv"
+            title="Minha Conta"
+          >
+            <User className="w-4 h-4 painel-ic flex-shrink-0" />
+            <span className="lbl">Minha Conta</span>
+          </Link>
+
           <button
             onClick={toggleDarkMode}
             className="painel-nv"

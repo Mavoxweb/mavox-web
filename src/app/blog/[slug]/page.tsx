@@ -101,26 +101,28 @@ export default async function BlogPostPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="min-h-screen bg-[#fafafc] dark:bg-[#0f172a]">
+      <div className="post-page min-h-screen">
         {/* Article Header */}
-        <header className="bg-white dark:bg-[#1e293b] border-b border-[#e2e8f0] dark:border-[#334155] pt-12 pb-10 px-6 sm:px-8 lg:px-12">
+        <header className="sticky top-0 z-30 backdrop-blur-xl border-b" style={{ background: "rgba(255,255,255,0.8)", backdropFilter: "blur(20px) saturate(180%)" }} />
+        <header className="relative px-6 sm:px-8 lg:px-12 pt-16 pb-12">
           <div className="max-w-4xl mx-auto">
-            <nav className="mb-6">
-              <Link
-                href="/blog"
-                className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
-              >
-                ← Voltar para todos os artigos
+            <nav className="mb-8" aria-label="Breadcrumb">
+              <Link href="/blog" className="back-link">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Voltar para todos os artigos
               </Link>
             </nav>
 
-            <div className="flex flex-wrap items-center gap-3 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-5">
               {post.ai_generated && (
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300">
+                <span className="px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide"
+                  style={{ background: "rgba(139,92,246,0.15)", color: "rgb(167,139,250)" }}>
                   IA Assistido
                 </span>
               )}
-              <span className="text-xs text-[#64748b] dark:text-[#94a3b8] font-medium">
+              <span className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>
                 {post.published_at
                   ? new Date(post.published_at).toLocaleDateString("pt-BR", {
                       day: "2-digit",
@@ -132,84 +134,82 @@ export default async function BlogPostPage({
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-[#0f172a] dark:text-[#f1f5f9] leading-tight mb-4">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.05] mb-5"
+              style={{ color: "var(--text)", letterSpacing: "-0.02em" }}>
               {post.title}
             </h1>
 
             {post.excerpt && (
-              <p className="text-lg sm:text-xl text-[#475569] dark:text-[#94a3b8] leading-relaxed max-w-3xl">
+              <p className="text-lg sm:text-xl max-w-3xl leading-relaxed mb-8" style={{ color: "var(--text-muted)" }}>
                 {post.excerpt}
               </p>
             )}
           </div>
         </header>
 
-        {/* Cover image */}
+        {/* Cover Image */}
         {coverUrl && (
-          <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 -mt-6 relative z-10">
-            <div className="rounded-2xl overflow-hidden shadow-xl border border-[#e2e8f0] dark:border-[#334155]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+          <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 -mt-8 relative z-10">
+            <div className="rounded-2xl overflow-hidden shadow-2xl border" style={{ borderColor: "var(--border)" }}>
               <img
                 src={coverUrl}
                 alt={post.title}
-                className="w-full aspect-[21/9] object-cover"
+                className="cover-image w-full aspect-[21/9] object-cover transition-transform duration-700 ease-out"
                 loading="eager"
+                style={{ transform: "scale(1)" }}
               />
             </div>
           </div>
         )}
 
         {/* Article Body */}
-        <main className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 py-14">
-          <article className="bg-white dark:bg-[#1e293b] p-8 sm:p-12 rounded-2xl border border-[#e2e8f0] dark:border-[#334155] shadow-sm">
-            {post.content ? (
-              <div
-                className="blog-body text-[#334155] dark:text-[#cbd5e1] leading-relaxed text-base sm:text-lg"
-                dangerouslySetInnerHTML={{ __html: htmlBody }}
-              />
-            ) : (
-              <div className="text-[#475569] dark:text-[#94a3b8] leading-relaxed space-y-6">
-                <p>
-                  No mercado digital altamente competitivo de hoje, empresas que estruturam sua presença na web com estratégia, clareza na proposta de valor e campanhas de conversão alcançam resultados consideravelmente superiores.
-                </p>
-                <h2>Como transformar visitantes em clientes reais</h2>
-                <p>
-                  Ter apenas um site bonito não é suficiente. Um projeto eficiente precisa combinar design responsivo e veloz, redação persuasiva (copywriting), e integrações diretas com canais de atendimento rápido, como o WhatsApp.
-                </p>
-              </div>
-            )}
+        <main className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 py-10 sm:py-16 lg:py-20 pb-20">
+          <article className="relative rounded-2xl shadow-sm" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+            <div className="p-8 sm:p-12 lg:p-16 blog-body" style={{ color: "var(--text)" }}>
+              {post.content ? (
+                <div dangerouslySetInnerHTML={{ __html: htmlBody }} />
+              ) : (
+                <div className="space-y-6 leading-relaxed">
+                  <p>
+                    No mercado digital altamente competitivo de hoje, empresas que estruturam sua presença na web com estratégia, clareza na proposta de valor e campanhas de conversão alcançam resultados consideravelmente superiores.
+                  </p>
+                  <h2>Como transformar visitantes em clientes reais</h2>
+                  <p>
+                    Ter apenas um site bonito não é suficiente. Um projeto eficiente precisa combinar design responsivo e veloz, redação persuasiva (copywriting), e integrações diretas com canais de atendimento rápido, como o WhatsApp.
+                  </p>
+                </div>
+              )}
 
-            {/* End CTA (já injetado automaticamente pelo injectCtas) */}
+              {/* Footer CTA inside article */}
+              <div className="mt-12 pt-8 border-t" style={{ borderColor: "var(--border)" }}>
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border rounded-2xl p-8 text-center" style={{ borderColor: "rgba(37,99,235,0.2)" }}>
+                  <h3 className="text-2xl font-extrabold mb-2" style={{ color: "var(--text)" }}>
+                    Pronto para sair do papel?
+                  </h3>
+                  <p className="text-sm mb-6 max-w-xl mx-auto" style={{ color: "var(--text-muted)" }}>
+                    A Mavox cria sites, landing pages e campanhas focadas em gerar orçamentos reais para o seu negócio.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <Link
+                      href="/orcamento"
+                      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-blue-600/20"
+                    >
+                      Solicite Orçamento Grátis
+                    </Link>
+                    <a
+                      href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent("Olá! Vi o artigo no blog da Mavox e quero falar sobre um projeto.")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-emerald-600/20"
+                    >
+                      Fale no WhatsApp
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </article>
         </main>
-
-        {/* Footer article meta */}
-        <footer className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 pb-16">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-900/30 rounded-2xl p-8 text-center">
-            <h3 className="text-xl font-extrabold text-[#0f172a] dark:text-[#f1f5f9] mb-2">
-              Pronto para sair do papel?
-            </h3>
-            <p className="text-sm text-[#475569] dark:text-[#94a3b8] mb-5 max-w-xl mx-auto">
-              A Mavox cria sites, landing pages e campanhas focadas em gerar orçamentos reais para o seu negócio.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <Link
-                href="/orcamento"
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-blue-600/20"
-              >
-                Solicite Orçamento Grátis
-              </Link>
-              <a
-                href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent("Olá! Vi o artigo no blog da Mavox e quero falar sobre um projeto.")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-emerald-600/20"
-              >
-                Fale no WhatsApp
-              </a>
-            </div>
-          </div>
-        </footer>
       </div>
     </>
   );
