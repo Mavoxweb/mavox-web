@@ -16,7 +16,7 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetch = async () => {
+    const loadData = async () => {
       try {
         const res = await fetch("/api/painel/onboarding", { credentials: "include" });
         const data = await res.json();
@@ -27,7 +27,7 @@ export default function OnboardingPage() {
         setLoading(false);
       }
     };
-    void fetch();
+    void loadData();
   }, []);
 
   return (
@@ -67,9 +67,9 @@ export default function OnboardingPage() {
                 </div>
               )}
             </Link>
-          )}
+          ))}
         </div>
-      }
+      )}
     </div>
   );
 }
