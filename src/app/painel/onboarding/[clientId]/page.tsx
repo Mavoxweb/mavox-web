@@ -99,9 +99,22 @@ export default function OnboardingPage({ params }: { params: Promise<{ clientId:
             </div>
           )}
           {tab === "financial" && (
-            <div>
-              <h2 className="text-lg font-bold mb-3">Financeiro</h2>
-              <p className="text-xs text-[#64748b]">MRR: ainda não configurado.</p>
+            <div className="space-y-4">
+              <h2 className="text-lg font-bold">Financeiro</h2>
+              <div className="bg-[#fafafc] dark:bg-[#0f172a] rounded-xl border border-[#e2e8f0] dark:border-[#334155] p-4">
+                <h3 className="text-xs font-bold uppercase text-[#64748b] mb-2">Novo Pagamento</h3>
+                <form onSubmit={(e)=>{e.preventDefault();alert("Salvar pagamento (exemplo)");}} className="grid gap-3 sm:grid-cols-4">
+                  <input type="date" placeholder="Vencimento" className="px-3 py-2 border rounded-lg text-xs" />
+                  <input type="number" placeholder="Valor" className="px-3 py-2 border rounded-lg text-xs" />
+                  <select className="px-3 py-2 border rounded-lg text-xs"><option>Pendente</option><option>Pago</option><option>Atrasado</option></select>
+                  <button className="px-3 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold">Adicionar</button>
+                </form>
+              </div>
+              <table className="w-full text-sm border-collapse">
+                <thead className="bg-[#f8fafc] dark:bg-[#0f172a]"><tr><th className="text-left px-3 py-2">Vencimento</th><th>Valor</th><th>Status</th></tr></thead>
+                <tbody className="divide-y divide-[#e2e8f0] dark:divide-[#334155]"><tr><td className="px-3 py-2">—</td><td className="text-xs text-[#475569]">—</td><td className="text-xs">—</td></tr></tbody>
+              </table>
+              <p className="text-xs text-[#94a3b8]">MRR / Receita Atrasada calculados ao salvar pagamentos.</p>
             </div>
           )}
           {tab === "reports" && (
