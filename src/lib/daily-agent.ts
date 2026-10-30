@@ -18,6 +18,7 @@ export interface OpportunityCandidate {
   action_url: string | null;
   action_label: string | null;
   source: "ai" | "regra";
+  metadata?: Record<string, unknown>;
 }
 
 export interface DailyAgentResult {
@@ -282,7 +283,88 @@ async function buildCandidates(): Promise<OpportunityCandidate[]> {
     });
   }
 
+  // FUP05: Re-engajamento inteligente - analisa leads perdidos
+  const reEngageCandidates = await buildReEngageCandidates();
+  candidates.push(...reEngageCandidates);
+
   return candidates.slice(0, 12);
+}
+
+async function buildReEngageCandidates(): Promise<OpportunityCandidate[]> {
+  const candidates: OpportunityCandidate[] = [];
+
+  // Buscar leads perdidos (recusado) há mais de 30 dias
+  const lostQuotes = await query<{
+    id: string;
+    code: string | null;
+    name: string;
+    updated_at: string;
+    total: string | null;
+    lost_reason: string | null;
+    lost_note: string | null;
+    client_id: string;
+    client_name: string;
+    client_phone: string | null;
+    client_email: string | null;
+  }>(
+    `SELECT q.id, q.code, q.updated_at, q.total, q.lost_reason, q.lost_note,
+            c.id as client_id, c.name as client_name, c.phone as client_phone, c.email as client_email
+     FROM quotes q
+     JOIN clients c ON c.id = q.client_id
+     WHERE q.status = 'recusado'
+       AND q.updated_at < now() - interval '30 days'
+     ORDER BY q.updated_at ASC
+     LIMIT 20`
+  );
+
+  for (const quote of lostQuotes) {
+    const daysSinceLost = Math.max(
+      1,
+      Math.floor((Date.now() - new Date(quote.updated_at).getTime()) / 86400000)
+    );
+
+    // Determinar estratégia baseada no motivo da perda
+    const reason = quote.lost_reason || "não_informado";
+    let strategy = "reengage_generic";
+    let suggestedAction = "Entrar em contato para saber como estão as coisas";
+    let priority: "alta" | "media" | "baixa" = "baixa";
+
+    if (reason === "concorrente") {
+      strategy = "reengage_competitor";
+      suggestedAction = "Oferecer diferenciais vs concorrente (suporte, velocidade, preço)";
+      priority = daysSinceLost >= 180 ? "alta" : "media";
+    } else if (reason === "orcamento" || reason === "preco") {
+      strategy = "reengage_budget";
+      suggestedAction = "Apresentar nova proposta com escopo ajustado ou condições especiais";
+      priority = "media";
+    } else if (reason === "prazo") {
+      strategy = "reengage_timeline";
+      suggestedAction = "Demonstrar capacidade de entrega mais rápida com nova equipe";
+      priority = "media";
+    }
+
+    candidates.push({
+      title: `Reativar: ${quote.client_name} (perdeu há ${daysSinceLost}d)`,
+      description: `Lead "${quote.client_name}" recusou orçamento ${quote.code ?? ""} (${reason}). ${quote.lost_note ? `Nota: ${quote.lost_note}` : ""}. Estratégia: ${suggestedAction}.`,
+      category: "reengage",
+      priority,
+      related_type: "quote",
+      related_id: quote.id,
+      action_url: `/painel/quotes/${quote.id}`,
+      action_label: "Ver histórico e reativar",
+      source: "ai",
+      // Metadados extras para o AI refinar
+      metadata: {
+        lost_reason: reason,
+        days_since_lost: daysSinceLost,
+        strategy,
+        client_phone: quote.client_phone,
+        client_email: quote.client_email,
+      },
+    });
+  }
+
+  return candidates;
 }
 
 interface AiRefinement {
@@ -328,6 +410,7 @@ async function refineWithAi(
     categoria: candidate.category,
     prioridade: candidate.priority,
     tipo_relacionado: candidate.related_type,
+    metadata: candidate.metadata || {},
   }));
 
   const result = await callOpenRouter({
@@ -342,7 +425,11 @@ async function refineWithAi(
         content:
           "Você é o agente diário comercial da MAVOX, agência de desenvolvimento web. " +
           "Recebe uma lista de oportunidades detectadas por regras e deve reescrever título, descrição e prioridade " +
-          "para maximizar clareza e ação. Responda SOMENTE JSON válido no formato " +
+          "para maximizar clareza e ação. " +
+          "Categorias: orcamento, followup, cliente, reuniao, geral, reengage. " +
+          "Para reengage (leads perdidos): use metadata.lost_reason, metadata.days_since_lost, metadata.strategy " +
+          "para criar títulos e descrições específicas de reativação. " +
+          "Responda SOMENTE JSON válido no formato " +
           '{"opportunities":[{"index":0,"title":"...","description":"...","priority":"alta|media|baixa"}]}. ' +
           "Mantenha todos os índices recebidos, sem inventar novos. Português do Brasil, tom direto e específico.",
       },
@@ -401,8 +488,8 @@ export async function runDailyAgent(): Promise<DailyAgentResult> {
     await run(
       `INSERT INTO ai_opportunities
          (run_date, title, description, category, priority, related_type, related_id,
-          action_url, action_label, source, status)
-       VALUES (CURRENT_DATE, $1, $2, $3, $4, $5, $6, $7, $8, $9, 'aberta')`,
+          action_url, action_label, source, status, metadata)
+       VALUES (CURRENT_DATE, $1, $2, $3, $4, $5, $6, $7, $8, $9, 'aberta', $10)`,
       [
         item.title,
         item.description,
@@ -413,6 +500,7 @@ export async function runDailyAgent(): Promise<DailyAgentResult> {
         item.action_url,
         item.action_label,
         item.source,
+        JSON.stringify(item.metadata || {}),
       ]
     );
   }

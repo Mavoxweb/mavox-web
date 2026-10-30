@@ -270,6 +270,7 @@ CREATE TABLE ai_opportunities (
   action_label text,
   source text NOT NULL DEFAULT 'regra',
   status text NOT NULL DEFAULT 'aberta',
+  metadata jsonb DEFAULT '{}'::jsonb,
   created_at timestamptz NOT NULL DEFAULT now()
 );
 

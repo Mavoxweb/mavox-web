@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS ai_opportunities (
   run_date date NOT NULL DEFAULT CURRENT_DATE,
   title text NOT NULL,
   description text NOT NULL,
-  category text NOT NULL DEFAULT 'geral',   -- orcamento | lead | followup | reuniao | cliente | geral
+  category text NOT NULL DEFAULT 'geral',   -- orcamento | lead | followup | reuniao | cliente | geral | reengage
   priority text NOT NULL DEFAULT 'media',   -- alta | media | baixa
   related_type text,                        -- quote | client | lead | appointment
   related_id uuid,
@@ -56,10 +56,12 @@ CREATE TABLE IF NOT EXISTS ai_opportunities (
   action_label text,
   source text NOT NULL DEFAULT 'regra',     -- ai | regra
   status text NOT NULL DEFAULT 'aberta',    -- aberta | concluida | descartada
+  metadata jsonb DEFAULT '{}'::jsonb,
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS ai_opportunities_run_idx ON ai_opportunities (run_date DESC);
 CREATE INDEX IF NOT EXISTS ai_opportunities_status_idx ON ai_opportunities (status);
+CREATE INDEX IF NOT EXISTS ai_opportunities_category_idx ON ai_opportunities (category);
 
 -- ---------- Alinhamento: followups.created_at (drift do banco) ----------
 ALTER TABLE followups ADD COLUMN IF NOT EXISTS created_at timestamptz DEFAULT now();
