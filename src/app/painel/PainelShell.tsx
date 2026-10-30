@@ -22,6 +22,7 @@ import {
   Bell,
   ExternalLink,
   Sliders,
+  Rocket,
 } from "lucide-react";
 
 const navigation = [
@@ -33,6 +34,7 @@ const navigation = [
   { name: "Blog", href: "/painel/blog", icon: FileText },
   { name: "Pixels", href: "/painel/pixels", icon: BarChart2 },
   { name: "Follow-ups", href: "/painel/followups", icon: MessageSquare },
+  { name: "Onboarding", href: "/painel/onboarding", icon: Rocket },
   { name: "Configurações", href: "/painel/settings", icon: Settings },
 ];
 

@@ -222,7 +222,7 @@ export default function DashboardClient({
               <ArrowRight className="w-3.5 h-3.5" style={{ color: "var(--mu)" }} />
             </Link>
 
-            <Link
+                         <Link
               href="/painel/blog/new"
               className="flex items-center justify-between p-3 rounded-xl border transition-all hover:translate-x-0.5"
               style={{ borderColor: "var(--bd)", background: "var(--side)" }}
@@ -240,7 +240,49 @@ export default function DashboardClient({
                   </p>
                 </div>
               </div>
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <ArrowRight className="w-3.5 h-3.5" style={{ color: "var(--mu)" }} />
+            </Link>
+
+            <Link
+              href="/painel/onboarding"
+              className="flex items-center justify-between p-3 rounded-xl border transition-all hover:translate-x-0.5"
+              style={{ borderColor: "var(--bd)", background: "var(--side)" }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-sky-500/10 text-sky-600">
+                  <CalendarPlus className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold" style={{ color: "var(--tx)" }}>
+                    Onboarding Clientes
+                  </p>
+                  <p className="text-[11px]" style={{ color: "var(--mu)" }}>
+                    Gerenciar contrato e checklist
+                  </p>
+                </div>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5" style={{ color: "var(--mu)" }} />
+            </Link>
+
+            <Link
+              href="/painel/onboarding/financeiro"
+              className="flex items-center justify-between p-3 rounded-xl border transition-all hover:translate-x-0.5"
+              style={{ borderColor: "var(--bd)", background: "var(--side)" }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600">
+                  <FileSpreadsheet className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold" style={{ color: "var(--tx)" }}>
+                    Financeiro
+                  </p>
+                  <p className="text-[11px]" style={{ color: "var(--mu)" }}>
+                    MRR / Pagamentos / Atrasos
+                  </p>
+                </div>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5" style={{ color: "var(--mu)" }} />
             </Link>
 
             <Link
