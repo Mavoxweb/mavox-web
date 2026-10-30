@@ -1,74 +1,142 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { AlertCircle, CheckCircle2, Clock, TerminalSquare } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { AlertCircle, CheckCircle2, TerminalSquare, RefreshCw, Loader2, Clock } from "lucide-react";
 
-interface DebugEvent {
-  event: string;
-  timestamp: string;
-  details?: Record<string, unknown>;
+interface PixelEventLog {
+  id: string;
+  event_name: string;
+  pixel_type: string;
+  pixel_id: string | null;
+  event_data: Record<string, unknown>;
+  event_id: string | null;
+  status: string;
+  error_message: string | null;
+  created_at: string;
 }
 
 export default function PixelDebugPage() {
-  const [events, setEvents] = useState<DebugEvent[]>([]);
-  const [status, setStatus] = useState<"ok" | "error">("ok");
+  const [events, setEvents] = useState<PixelEventLog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const w = window as typeof window & { dataLayer?: Record<string, unknown>[] };
-    const layer = w.dataLayer || [];
-    const parsed: DebugEvent[] = layer
-      .filter((e: unknown): e is Record<string, unknown> => typeof e === "object" && e !== null && (e as Record<string, unknown>).event !== undefined)
-      .map((e: Record<string, unknown>) => ({
-        event: String(e.event),
-        timestamp: new Date().toISOString(),
-        details: Object.fromEntries(Object.entries(e).filter(([k]) => k !== "event")),
-      }));
-    setEvents(parsed);
+  const fetchEvents = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/painel/pixels/log?limit=50", { credentials: "include" });
+      if (!res.ok) throw new Error("Erro ao buscar logs");
+      const data = await res.json();
+      setEvents(data.data || []);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao carregar logs");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    fetchEvents();
+    const interval = setInterval(fetchEvents, 5000); // Poll a cada 5s para tempo real
+    return () => clearInterval(interval);
+  }, [fetchEvents]);
+
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold text-[#0f172a] dark:text-[#f1f5f9]">Debug de Pixels</h1>
-        <p className="text-sm text-[#64748b] dark:text-[#94a3b8] mt-1">
-          Eventos capturados do dataLayer (GTM) e scripts de pixel.
-        </p>
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold" style={{ color: "var(--text)" }}>Debug de Pixels</h1>
+          <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
+            Log persistente dos últimos 50 eventos disparados (atualiza a cada 5s)
+          </p>
+        </div>
+        <button
+          onClick={fetchEvents}
+          disabled={loading}
+          className="inline-flex items-center gap-2 px-4 py-2 border rounded-xl text-sm font-medium transition-colors"
+          style={{ borderColor: "var(--border)", color: "var(--text)", background: "var(--surface-elevated)" }}
+        >
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          Atualizar
+        </button>
       </div>
 
-      <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-[#e2e8f0] dark:border-[#334155] p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-[#0f172a] dark:text-[#f1f5f9]">Eventos Recentes</h2>
-          <span
-            className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${
-              status === "ok" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
-            }`}
-          >
-            {status === "ok" ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
-            {status === "ok" ? "Conectado" : "Erro"}
-          </span>
+      {error && (
+        <div className="p-4 rounded-xl text-sm" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid var(--bad)", color: "var(--bad)" }}>
+          <AlertCircle className="w-4 h-4 inline mr-2" /> {error}
         </div>
+      )}
 
-        <div className="rounded-xl border border-[#e2e8f0] dark:border-[#334155] overflow-hidden">
+      <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+        <div className="bg-[var(--surface-elevated)] border-b p-4" style={{ borderColor: "var(--border)" }}>
+          <h2 className="text-sm font-semibold" style={{ color: "var(--text)" }}>Eventos Recentes (últimos 50)</h2>
+        </div>
+        <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-[#f8fafc] dark:bg-[#0f172a] border-b border-[#e2e8f0] dark:border-[#334155]">
+            <thead className="bg-[var(--surface-elevated)] border-b" style={{ borderColor: "var(--border)" }}>
               <tr>
-                <th className="text-left px-4 py-2.5 text-xs font-semibold text-[#475569] dark:text-[#94a3b8]">Evento</th>
-                <th className="text-left px-4 py-2.5 text-xs font-semibold text-[#475569] dark:text-[#94a3b8]">Detalhes</th>
+                <th className="text-left px-4 py-2.5 text-xs font-semibold" style={{ color: "var(--text-muted)" }}>Evento</th>
+                <th className="text-left px-4 py-2.5 text-xs font-semibold" style={{ color: "var(--text-muted)" }}>Tipo</th>
+                <th className="text-left px-4 py-2.5 text-xs font-semibold" style={{ color: "var(--text-muted)" }}>Pixel ID</th>
+                <th className="text-left px-4 py-2.5 text-xs font-semibold" style={{ color: "var(--text-muted)" }}>Event ID</th>
+                <th className="text-left px-4 py-2.5 text-xs font-semibold" style={{ color: "var(--text-muted)" }}>Status</th>
+                <th className="text-left px-4 py-2.5 text-xs font-semibold" style={{ color: "var(--text-muted)" }}>Horário</th>
+                <th className="text-left px-4 py-2.5 text-xs font-semibold" style={{ color: "var(--text-muted)" }}>Detalhes</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#e2e8f0] dark:divide-[#334155]">
+            <tbody className="divide-y" style={{ borderColor: "var(--border)" }}>
               {events.length === 0 ? (
                 <tr>
-                  <td colSpan={2} className="px-4 py-4 text-[#94a3b8] text-xs">
-                    Nenhum evento capturado ainda. Interaja com a página para gerar eventos.
+                  <td colSpan={7} className="px-4 py-8 text-center text-xs" style={{ color: "var(--text-muted)" }}>
+                    Nenhum evento registrado ainda. Interaja com o site para gerar eventos.
                   </td>
                 </tr>
               ) : (
                 events.map((ev, i) => (
-                  <tr key={i} className="hover:bg-[#f8fafc] dark:hover:bg-[#334155]/30">
-                    <td className="px-4 py-3 font-mono text-xs text-blue-700 dark:text-blue-400">{ev.event}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-[#64748b] dark:text-[#94a3b8]">
-                      {JSON.stringify(ev.details || {}, null, 0)}
+                  <tr key={ev.id} className="hover:bg-[var(--surface-elevated)]">
+                    <td className="px-4 py-3 font-mono text-xs" style={{ color: "var(--accent)" }}>
+                      {ev.event_name}
+                    </td>
+                    <td className="px-4 py-3 px-4 py-3">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium"
+                        style={{
+                          background: ev.pixel_type === "meta_capi" ? "rgba(139,92,246,0.15)" :
+                                    ev.pixel_type === "gtm" ? "rgba(59,130,246,0.15)" :
+                                    ev.pixel_type === "meta_pixel" ? "rgba(249,168,37,0.15)" :
+                                    "rgba(16,185,129,0.15)",
+                          color: ev.pixel_type === "meta_capi" ? "rgb(167,139,250)" :
+                                   ev.pixel_type === "gtm" ? "rgb(96,165,250)" :
+                                   ev.pixel_type === "meta_pixel" ? "rgb(250,204,21)" :
+                                   "rgb(34,197,94)",
+                        }}>
+                        {ev.pixel_type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs truncate max-w-[120px]" style={{ color: "var(--text-muted)" }}>
+                      {ev.pixel_id || "—"}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs truncate max-w-[100px]" style={{ color: "var(--text-muted)" }}>
+                      {ev.event_id || "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium ${
+                        ev.status === "sent" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300" :
+                        ev.status === "failed" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300" :
+                        "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+                      }`}>
+                        {ev.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-xs" style={{ color: "var(--text-muted)" }}>
+                      {new Date(ev.created_at).toLocaleTimeString("pt-BR", { hour12: false })}
+                    </td>
+                    <td className="px-4 py-3">
+                      <details className="cursor-pointer">
+                        <summary className="text-xs text-blue-600 dark:text-blue-400 hover:underline">Ver JSON</summary>
+                        <pre className="mt-1 p-2 rounded text-[10px] overflow-x-auto max-h-32" style={{ background: "var(--surface-elevated)", color: "var(--text-muted)" }}>
+                          {JSON.stringify(ev.event_data, null, 2)}
+                        </pre>
+                      </details>
                     </td>
                   </tr>
                 ))
@@ -78,21 +146,19 @@ export default function PixelDebugPage() {
         </div>
       </div>
 
-      {/* Botão "Testar" visual */}
-      <div className="flex flex-wrap gap-3">
+      {/* Botões de teste rápidos */}
+      <div className="flex flex-wrap gap-3 p-4 rounded-2xl border" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+        <h3 className="w-full text-sm font-semibold mb-3" style={{ color: "var(--text)" }}>Testes Rápidos</h3>
         <button
           type="button"
           onClick={() => {
             const w = window as typeof window & { dataLayer?: Record<string, unknown>[] };
             w.dataLayer = w.dataLayer || [];
             w.dataLayer.push({ event: "whatsapp_click", url: "https://wa.me/5521992855872", text: "Botão de Teste" });
-            setEvents((prev) => [
-              ...prev,
-              { event: "whatsapp_click", timestamp: new Date().toISOString(), details: { url: "https://wa.me/5521992855872" } },
-            ]);
-            setStatus("ok");
+            fetchEvents();
           }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+          style={{ background: "var(--accent)", color: "white" }}
         >
           <TerminalSquare className="w-4 h-4" />
           Testar WhatsApp Click
@@ -103,16 +169,41 @@ export default function PixelDebugPage() {
             const w = window as typeof window & { dataLayer?: Record<string, unknown>[] };
             w.dataLayer = w.dataLayer || [];
             w.dataLayer.push({ event: "form_submit", form_action: "/teste", form_id: "teste-form" });
-            setEvents((prev) => [
-              ...prev,
-              { event: "form_submit", timestamp: new Date().toISOString(), details: { form_action: "/teste" } },
-            ]);
-            setStatus("ok");
+            fetchEvents();
           }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 border border-[#cbd5e1] dark:border-[#475569] rounded-xl text-sm font-semibold text-[#334155] dark:text-[#cbd5e1] hover:bg-[#f8fafc] dark:hover:bg-[#334155] transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-semibold transition-colors"
+          style={{ borderColor: "var(--border)", color: "var(--text)", background: "var(--surface-elevated)" }}
         >
           <Clock className="w-4 h-4" />
           Testar Form Submit
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const w = window as typeof window & { dataLayer?: Record<string, unknown>[] };
+            w.dataLayer = w.dataLayer || [];
+            w.dataLayer.push({ event: "proposal_view", proposal_id: "test-123", proposal_token: "MVX-2026-TEST" });
+            fetchEvents();
+          }}
+          className="inline-flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-semibold transition-colors"
+          style={{ borderColor: "var(--border)", color: "var(--text)", background: "var(--surface-elevated)" }}
+        >
+          <TerminalSquare className="w-4 h-4" />
+          Testar Proposal View
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const w = window as typeof window & { dataLayer?: Record<string, unknown>[] };
+            w.dataLayer = w.dataLayer || [];
+            w.dataLayer.push({ event: "proposal_accept", proposal_id: "test-123", proposal_token: "MVX-2026-TEST", value: 5000, currency: "BRL" });
+            fetchEvents();
+          }}
+          className="inline-flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-semibold transition-colors"
+          style={{ borderColor: "var(--border)", color: "var(--text)", background: "var(--surface-elevated)" }}
+        >
+          <CheckCircle2 className="w-4 h-4" />
+          Testar Proposal Accept
         </button>
       </div>
     </div>

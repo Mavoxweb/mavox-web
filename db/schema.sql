@@ -173,14 +173,33 @@ CREATE TABLE followups (
 CREATE INDEX followups_quote_idx ON followups (quote_id);
 CREATE INDEX followups_stage_idx ON followups (stage);
 
--- Pixels de conversão
+-- Pixels de conversão (mapeamento de eventos para IDs de pixel)
 CREATE TABLE pixel_events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text NOT NULL, -- 'visita', 'clique_whatsapp', 'envio_orcamento', 'proposta_aceita'
+  name text NOT NULL, -- 'visita', 'clique_whatsapp', 'envio_orcamento', 'proposta_aceita', 'lead'
   pixel_id_meta text,
   pixel_id_google text,
+  pixel_id_tiktok text,
   created_at timestamptz DEFAULT now()
 );
+
+-- Log de eventos de pixel disparados (Fase 4 - PIX06)
+CREATE TABLE pixel_event_logs (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_name text NOT NULL,
+  pixel_type text NOT NULL, -- 'gtm', 'ga4', 'meta_pixel', 'meta_capi', 'tiktok'
+  pixel_id text,
+  event_data jsonb NOT NULL DEFAULT '{}'::jsonb,
+  event_id text, -- para deduplicação (Meta CAPI)
+  user_agent text,
+  ip_hash text,
+  status text NOT NULL DEFAULT 'sent', -- 'sent', 'failed', 'deduplicated'
+  error_message text,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX pixel_event_logs_created_idx ON pixel_event_logs (created_at DESC);
+CREATE INDEX pixel_event_logs_event_idx ON pixel_event_logs (event_name);
+CREATE INDEX pixel_event_logs_type_idx ON pixel_event_logs (pixel_type);
 
 -- Configurações globais
 CREATE TABLE settings (
@@ -193,6 +212,13 @@ CREATE TABLE settings (
   whatsapp_number text,
   meta_pixel_id text,
   google_ads_id text,
+  -- GTM / Analytics (Fase 4)
+  gtm_id text,
+  ga4_measurement_id text,
+  tiktok_pixel_id text,
+  -- Meta CAPI (Fase 4)
+  meta_capi_access_token text,
+  meta_capi_pixel_id text,
   -- SMTP (Fase 2)
   smtp_host text,
   smtp_port int DEFAULT 587,

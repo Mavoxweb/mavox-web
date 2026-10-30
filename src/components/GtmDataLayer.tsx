@@ -14,6 +14,34 @@ export function pushEvent(event: DataLayerEvent) {
   w.dataLayer.push(event);
 }
 
+/**
+ * Hook para disparar eventos de pixel programaticamente
+ * Uso: const { trackProposalView, trackProposalAccept, trackLead } = usePixelEvents();
+ */
+export function usePixelEvents() {
+  const trackProposalView = useCallback((proposalId: string, proposalToken: string) => {
+    pushEvent({ event: "proposal_view", proposal_id: proposalId, proposal_token: proposalToken });
+  }, []);
+
+  const trackProposalAccept = useCallback((proposalId: string, proposalToken: string, value: number, currency = "BRL") => {
+    pushEvent({ event: "proposal_accept", proposal_id: proposalId, proposal_token: proposalToken, value, currency });
+  }, []);
+
+  const trackLead = useCallback((leadData: Record<string, unknown>) => {
+    pushEvent({ event: "lead", ...leadData });
+  }, []);
+
+  const trackWhatsAppClick = useCallback((url: string, text: string) => {
+    pushEvent({ event: "whatsapp_click", url, text });
+  }, []);
+
+  const trackFormSubmit = useCallback((formAction: string, formId: string) => {
+    pushEvent({ event: "form_submit", form_action: formAction, form_id: formId });
+  }, []);
+
+  return { trackProposalView, trackProposalAccept, trackLead, trackWhatsAppClick, trackFormSubmit, pushEvent };
+}
+
 export default function GtmDataLayer() {
   const initDataLayer = useCallback(() => {
     if (typeof window === "undefined") return;

@@ -27,6 +27,13 @@ interface Settings {
   whatsapp_number: string;
   meta_pixel_id: string;
   google_ads_id: string;
+  // GTM / Analytics (Fase 4)
+  gtm_id: string;
+  ga4_measurement_id: string;
+  tiktok_pixel_id: string;
+  // Meta CAPI (Fase 4)
+  meta_capi_access_token: string;
+  meta_capi_pixel_id: string;
   smtp_host: string;
   smtp_port: number;
   smtp_user: string;
@@ -59,6 +66,13 @@ const INITIAL: Settings = {
   whatsapp_number: "5521992855872",
   meta_pixel_id: "",
   google_ads_id: "",
+  // GTM / Analytics (Fase 4)
+  gtm_id: "",
+  ga4_measurement_id: "",
+  tiktok_pixel_id: "",
+  // Meta CAPI (Fase 4)
+  meta_capi_access_token: "",
+  meta_capi_pixel_id: "",
   smtp_host: "",
   smtp_port: 587,
   smtp_user: "",
@@ -325,14 +339,40 @@ export default function SettingsPage() {
                 <Shield className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Pixels de Rastreamento</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Pixels & Analytics</h2>
                 <p className="text-gray-500 text-sm">
-                  IDs para Meta Ads (Facebook/Instagram) e Google Ads
+                  GTM, GA4, Meta Pixel (cliente + CAPI), TikTok
                 </p>
               </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">GTM Container ID</label>
+                <input
+                  type="text"
+                  value={settings.gtm_id}
+                  onChange={(e) => handleChange("gtm_id", e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Ex: GTM-XXXXXXX"
+                />
+                <p className="mt-1 text-sm text-gray-500">
+                  Google Tag Manager (inclui GA4 via GTM)
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">GA4 Measurement ID</label>
+                <input
+                  type="text"
+                  value={settings.ga4_measurement_id}
+                  onChange={(e) => handleChange("ga4_measurement_id", e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Ex: G-XXXXXXXXXX"
+                />
+                <p className="mt-1 text-sm text-gray-500">
+                  Opcional se GA4 já estiver no GTM
+                </p>
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Meta Pixel ID</label>
                 <input
@@ -343,10 +383,49 @@ export default function SettingsPage() {
                   placeholder="Ex: 123456789012345"
                 />
                 <p className="mt-1 text-sm text-gray-500">
-                  Encontrado no Gerenciador de Eventos do Facebook
+                  Pixel do Facebook/Instagram (client-side)
                 </p>
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Meta CAPI Access Token</label>
+                <input
+                  type="password"
+                  value={settings.meta_capi_access_token}
+                  onChange={(e) => handleChange("meta_capi_access_token", e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="EAAGxxxxx..."
+                />
+                <p className="mt-1 text-sm text-gray-500">
+                  Token com permissão ads_management + ads_read
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Meta CAPI Pixel ID</label>
+                <input
+                  type="text"
+                  value={settings.meta_capi_pixel_id}
+                  onChange={(e) => handleChange("meta_capi_pixel_id", e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Ex: 123456789012345 (mesmo do Pixel acima)"
+                />
+                <p className="mt-1 text-sm text-gray-500">
+                  ID do Pixel para Events API server-side
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">TikTok Pixel ID</label>
+                <input
+                  type="text"
+                  value={settings.tiktok_pixel_id}
+                  onChange={(e) => handleChange("tiktok_pixel_id", e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Ex: CXXXXXXXXXXXXXXXX"
+                />
+                <p className="mt-1 text-sm text-gray-500">
+                  TikTok Events API (opcional)
+                </p>
+              </div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Google Ads ID</label>
                 <input
                   type="text"

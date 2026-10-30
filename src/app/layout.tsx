@@ -256,13 +256,13 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph) }}
         />
 
-        {/* Injeção Dinâmica dos Pixels (Meta Ads e Google Ads) */}
+        {/* Injeção Dinâmica dos Pixels (GTM, GA4 via GTM, Meta Pixel + CAPI, TikTok) */}
         <PixelTracker
           metaPixelId={pixelConfigs.metaPixelId}
-          googleTagId={pixelConfigs.googleTagId}
-          gtmId={process.env.NEXT_PUBLIC_GTM_ID}
-          metaCapiAccessToken={process.env.META_CAPI_ACCESS_TOKEN}
-          metaCapiPixelId={process.env.META_CAPI_PIXEL_ID}
+          gtmId={pixelConfigs.gtmId}
+          tiktokPixelId={pixelConfigs.tiktokPixelId}
+          metaCapiAccessToken={pixelConfigs.metaCapiAccessToken}
+          metaCapiPixelId={pixelConfigs.metaCapiPixelId}
         />
         <GtmDataLayer />
       </body>
