@@ -1,4 +1,5 @@
 import { query, queryOne, run } from "@/lib/db";
+import { isCronAuthorized } from "@/lib/cron-auth";
 import type { NextRequest } from "next/server";
 
 interface FollowupRule {
@@ -258,8 +259,7 @@ async function processRuleById(ruleId: string): Promise<number> {
 }
 
 export async function GET(req: NextRequest) {
-  const auth = req.headers.get("authorization") || req.nextUrl.searchParams.get("token");
-  if (auth !== process.env.CRON_SECRET) {
+  if (!isCronAuthorized(req)) {
     return new Response(JSON.stringify({ error: "Não autorizado" }), { status: 401 });
   }
 
@@ -299,8 +299,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const auth = req.headers.get("authorization") || req.nextUrl.searchParams.get("token");
-  if (auth !== process.env.CRON_SECRET) {
+  if (!isCronAuthorized(req)) {
     return new Response(JSON.stringify({ error: "Não autorizado" }), { status: 401 });
   }
 

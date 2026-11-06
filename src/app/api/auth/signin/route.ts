@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { queryOne } from "@/lib/db";
 import bcrypt from "bcryptjs";
+import { SESSION_COOKIE, sessionCookieOptions, signSession } from "@/lib/session";
 
 export async function POST(request: Request) {
   try {
@@ -32,18 +33,13 @@ export async function POST(request: Request) {
     // Criar sessão - definir cookie httpOnly
     const response = NextResponse.json({ ok: true, user: { id: account.userId, email: account.email, name: account.name, role: account.role } });
     
-    response.cookies.set("mavox_session", JSON.stringify({
+    const token = await signSession({
       userId: account.userId,
       email: account.email,
       name: account.name,
       role: account.role,
-    }), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 dias
     });
+    response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions);
 
     return response;
   } catch (err) {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { query, run } from "@/lib/db";
+import { isCronAuthorized } from "@/lib/cron-auth";
 
 interface ScheduledPost {
   id: string;
@@ -8,10 +9,7 @@ interface ScheduledPost {
 
 export async function GET(request: Request) {
   // Verificar segredo do cron (apenas Vercel Cron Jobs podem chamar)
-  const authHeader = request.headers.get("authorization");
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  if (!isCronAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

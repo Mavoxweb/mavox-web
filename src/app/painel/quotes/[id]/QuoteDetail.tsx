@@ -72,6 +72,10 @@ export function QuoteDetail({ quoteId }: { quoteId: string }) {
       </div>
     );
   }
+  return <QuoteDetailContent quoteId={quoteId} />;
+}
+
+function QuoteDetailContent({ quoteId }: { quoteId: string }) {
   const router = useRouter();
   const [quote, setQuote] = useState<Quote | null>(null);
   const [items, setItems] = useState<QuoteItem[]>([]);

@@ -1,17 +1,12 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { SESSION_COOKIE, verifySession } from "@/lib/session";
 
 export async function GET() {
   const cookieStore = await cookies();
-  const session = cookieStore.get("mavox_session")?.value;
-  if (!session) {
+  const user = await verifySession(cookieStore.get(SESSION_COOKIE)?.value);
+  if (!user) {
     return NextResponse.json({ ok: false, user: null }, { status: 401 });
   }
-
-  try {
-    const user = JSON.parse(session);
-    return NextResponse.json({ ok: true, user });
-  } catch {
-    return NextResponse.json({ ok: false, user: null }, { status: 401 });
-  }
+  return NextResponse.json({ ok: true, user });
 }

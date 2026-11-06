@@ -2,16 +2,11 @@ import { NextResponse } from "next/server";
 import { queryOne, run } from "@/lib/db";
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
+import { SESSION_COOKIE, sessionCookieOptions, signSession, verifySession } from "@/lib/session";
 
 async function getCurrentUser() {
   const cookieStore = await cookies();
-  const session = cookieStore.get("mavox_session")?.value;
-  if (!session) return null;
-  try {
-    return JSON.parse(session);
-  } catch {
-    return null;
-  }
+  return verifySession(cookieStore.get(SESSION_COOKIE)?.value);
 }
 
 export async function GET() {
@@ -106,13 +101,7 @@ export async function PUT(request: Request) {
     if (name !== undefined) {
       const updatedUser = { ...user, name };
       const cookieStore = await cookies();
-      cookieStore.set("mavox_session", JSON.stringify(updatedUser), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-      });
+      cookieStore.set(SESSION_COOKIE, await signSession(updatedUser), sessionCookieOptions);
     }
 
     return NextResponse.json({ ok: true });
