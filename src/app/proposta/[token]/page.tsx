@@ -199,9 +199,9 @@ export default function ProposalPage({ params }: { params: Promise<{ token: stri
         <div className="text-center p-8 bg-white rounded-lg shadow-md border border-gray-200">
           <h1 className="text-xl font-semibold text-red-600 mb-2">{error || "Proposta não encontrada"}</h1>
           <p className="text-gray-600 mb-4">O link da proposta pode estar inválido ou expirado.</p>
-          <a href="/" className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <Link href="/" className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             Voltar ao início
-          </a>
+          </Link>
         </div>
       </div>
     );

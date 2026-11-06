@@ -173,7 +173,7 @@ async function processReEngage(rule: FollowupRule): Promise<number> {
   const status = config.status as string | undefined;
   const lostReason = config.lost_reason as string | undefined;
 
-  let clients: { id: string; name: string; phone: string | null; email: string | null }[] = [];
+  const clients: { id: string; name: string; phone: string | null; email: string | null }[] = [];
 
   if (status) {
     const quotes = await query<{ client_id: string }>(
