@@ -5,6 +5,7 @@ import Link from "next/link";
 
 interface OnboardingRow {
   id: string;
+  client_id?: string;
   client_name: string;
   quote_id?: string;
   status: string;
@@ -19,8 +20,9 @@ export default function OnboardingPage() {
     const loadData = async () => {
       try {
         const res = await fetch("/api/painel/onboarding", { credentials: "include" });
-        const data = await res.json();
-        setData(data);
+        const json = await res.json();
+        const rows = Array.isArray(json) ? json : json?.data;
+        setData(Array.isArray(rows) ? rows : []);
       } catch {
         // Silenciar
       } finally {
@@ -52,7 +54,7 @@ export default function OnboardingPage() {
           {data.map((row) => (
             <Link
               key={row.id}
-              href={`/painel/onboarding/${row.id}`}
+              href={`/painel/onboarding/${row.client_id ?? row.id}`}
               className="block p-4 rounded-xl border border-[#e2e8f0] dark:border-[#334155] hover:shadow-md transition-shadow bg-white dark:bg-[#1e293b] hover:bg-[#f8fafc] dark:hover:bg-[#334155]/30"
             >
               <div className="font-semibold text-[#0f172a] dark:text-[#f1f5f9] mb-1 truncate">

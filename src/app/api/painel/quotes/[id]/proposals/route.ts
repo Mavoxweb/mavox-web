@@ -9,10 +9,10 @@ export async function GET(
     const { id } = await params;
 
     const proposals = await query(
-      `SELECT id, quote_id, version, public_token, content, created_at, sent_at, viewed_at, accepted_at
+      `SELECT id, quote_id, version, public_token, content, sent_at, viewed_at, accepted_at
        FROM proposals
        WHERE quote_id = $1
-       ORDER BY version DESC, created_at DESC`,
+       ORDER BY version DESC`,
       [id]
     );
 

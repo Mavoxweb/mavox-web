@@ -51,8 +51,20 @@ interface QuoteEvent {
   id: string;
   quote_id: string;
   type: string;
-  data: string | null;
+  data: string | Record<string, unknown> | null;
   created_at: string;
+}
+
+// quote_events.data é jsonb: o driver devolve objeto, mas aceitamos string JSON também.
+function getEventLabel(data: QuoteEvent["data"]): string {
+  if (!data) return "Evento";
+  try {
+    const parsed = typeof data === "string" ? JSON.parse(data) : data;
+    const status = (parsed as { status?: unknown })?.status;
+    return typeof status === "string" && status ? status : "Evento";
+  } catch {
+    return "Evento";
+  }
 }
 
 interface Client {
@@ -553,7 +565,7 @@ function QuoteDetailContent({ quoteId }: { quoteId: string }) {
                     <div className="w-2 h-2 rounded-full bg-gray-300 mt-1" />
                     <div>
                       <p className="text-sm font-medium text-gray-900">{event.type.replace(/_/g, " ").toUpperCase()}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{event.data ? JSON.parse(event.data).status || "Evento" : "Evento"}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{getEventLabel(event.data)}</p>
                       <p className="text-xs text-gray-400 mt-1">{new Date(event.created_at).toLocaleString("pt-BR")}</p>
                     </div>
                   </div>
