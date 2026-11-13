@@ -12,7 +12,8 @@ export const showClients = clients.length >= MIN_CLIENTS;
 export type Metric = { prefix?: string; value: number; suffix?: string; label: string };
 
 /**
- * TODO(dados reais): informe métricas verdadeiras. Sem itens, a faixa é ocultada.
- * Ex.: { prefix: "+", value: 100, label: "projetos entregues" }
+ * Só entra número confirmado. +164 projetos é real; não inventar outras faixas.
  */
-export const metrics: Metric[] = [];
+export const metrics: Metric[] = [
+  { prefix: "+", value: 164, label: "projetos" },
+];

@@ -34,7 +34,7 @@ export function MetricsPanel({ metrics }: { metrics: Metric[] }) {
   if (!metrics.length) return null;
   return (
     <div className="container-x relative z-10 -mb-12 mt-12 sm:-mb-14">
-      <dl className="glass shadow-float grid grid-cols-2 gap-y-6 rounded-[var(--radius-block)] border border-line p-6 sm:p-8 lg:grid-cols-4">
+      <dl className={`glass shadow-float grid gap-y-6 rounded-[var(--radius-block)] border border-line p-6 sm:p-8 ${metrics.length > 1 ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-1"}`}>
         {metrics.map((m) => (
           <div key={m.label} className="flex flex-col text-center">
             <dt className="order-2 mt-1 text-sm text-fg-muted">{m.label}</dt>
