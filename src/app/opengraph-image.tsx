@@ -1,4 +1,5 @@
 ﻿import { ImageResponse } from "next/og";
+import { claimCopy } from "@/data/claims";
 
 export const alt = "Mavox: sites e sistemas que geram clientes";
 export const size = { width: 1200, height: 630 };
@@ -16,7 +17,7 @@ export default function OG() {
           <span>Seu site deveria</span>
           <span>trazer clientes.</span>
         </div>
-        <div style={{ display: "flex", fontSize: 30, color: "#4CB748" }}>Proposta grátis em até 24h</div>
+        <div style={{ display: "flex", fontSize: 30, color: "#4CB748" }}>{claimCopy.ogLine}</div>
       </div>
     ),
     size

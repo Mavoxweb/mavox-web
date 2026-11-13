@@ -1,4 +1,5 @@
 import Image from "next/image";
+
 import type { CaseShot } from "@/data/cases";
 
 function Shot({
@@ -62,11 +63,14 @@ export function PhoneFrame({
   sizes,
   eager,
   priority,
+  maxScreenHeight,
 }: {
   shot: CaseShot;
   sizes: string;
   eager?: boolean;
   priority?: boolean;
+  /** Corta a tela e mostra o topo. A moldura fica em torno de 360px. */
+  maxScreenHeight?: number;
 }) {
   return (
     <div className="min-w-0 rounded-[1.7rem] bg-bg p-1.5 shadow-float ring-1 ring-white/15">
@@ -74,7 +78,13 @@ export function PhoneFrame({
         <div className="flex justify-center bg-bg py-1.5" aria-hidden>
           <span className="h-1.5 w-10 rounded-full bg-white/30" />
         </div>
-        <Shot shot={shot} sizes={sizes} eager={eager} priority={priority} />
+        {maxScreenHeight ? (
+          <div className="relative overflow-hidden bg-white" style={{ height: maxScreenHeight }}>
+            <Image src={shot.src} alt={shot.alt} fill sizes={sizes} className="object-cover object-top" {...(priority ? { priority: true } : { loading: eager ? "eager" as const : "lazy" as const })} />
+          </div>
+        ) : (
+          <Shot shot={shot} sizes={sizes} eager={eager} priority={priority} />
+        )}
       </div>
     </div>
   );

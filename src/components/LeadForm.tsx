@@ -6,6 +6,7 @@ import { leadSchema, maskPhone, businessTypes, type LeadInput } from "@/lib/lead
 import { submitLead } from "@/app/actions/lead";
 import { notify } from "@/lib/notify";
 import { trackLead } from "@/lib/analytics";
+import { claimCopy } from "@/data/claims";
 
 const input = "mt-1.5 min-h-12 w-full rounded-[var(--radius-input)] border border-paper-line bg-white px-4 text-base text-paper-ink outline-none transition-colors placeholder:text-paper-muted/70 focus:border-accent-ink focus:ring-2 focus:ring-accent/40 aria-[invalid=true]:border-danger";
 
@@ -20,7 +21,7 @@ export function LeadForm() {
     try {
       await notify.promise(p, {
         loading: "Enviando seu pedido...",
-        success: "Recebemos! Sua proposta chega em até 24h.",
+        success: claimCopy.formSuccess,
         error: "Não foi possível enviar agora.",
       });
       trackLead("formulario");
@@ -33,7 +34,7 @@ export function LeadForm() {
   return (
     <form onSubmit={onSubmit} noValidate className="surface-light rounded-[var(--radius-block)] p-6 shadow-float sm:p-8" aria-labelledby="lead-title">
       <h3 id="lead-title" className="t-h3">Receba sua proposta grátis</h3>
-      <p className="mt-1 text-sm">Leva menos de 1 minuto. Respondemos em até 24h.</p>
+      <p className="mt-1 text-sm">{claimCopy.formHint}</p>
 
       <div className="mt-6 space-y-4">
         <label className="block text-sm font-medium text-paper-ink">Seu nome

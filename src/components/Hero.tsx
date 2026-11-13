@@ -1,8 +1,9 @@
 ﻿import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
+import { claimCopy } from "@/data/claims";
 import { HeroShowcase } from "./HeroShowcase";
 
-const assurances = ["Sem compromisso", "Resposta em até 24h", "Você é dono do site"];
+const assurances = ["Sem compromisso", claimCopy.heroAssurance, "Você é dono do site"];
 
 export function Hero() {
   return (
@@ -19,12 +20,10 @@ export function Hero() {
           <h1 className="t-h1 mt-6 text-white">
             Seu site deveria trazer clientes. <span className="text-accent">O nosso traz.</span>
           </h1>
-          <p className="t-lead mt-6 max-w-xl">
-            Sites, lojas e sistemas pensados para uma coisa só: gerar contatos e aumentar o faturamento da sua empresa. Sem enrolação e com proposta em até 24h.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a href="#contato" className="btn btn-primary">Receber minha proposta grátis <ArrowRight className="h-5 w-5" aria-hidden /></a>
-            <Link href="/#servicos" className="btn btn-ghost">Ver o cardápio de serviços</Link>
+          <p className="t-lead mt-6 max-w-xl">{claimCopy.heroLead}</p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-nowrap">
+            <a href="#contato" className="btn btn-primary whitespace-nowrap">Quero minha proposta <ArrowRight className="h-5 w-5" aria-hidden /></a>
+            <Link href="/#servicos" className="btn btn-ghost whitespace-nowrap">Ver serviços</Link>
           </div>
           <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white">
             {assurances.map((t) => (

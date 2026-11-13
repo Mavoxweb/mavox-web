@@ -1,5 +1,6 @@
 import { marked } from "marked";
 import { SITE, whatsappLink } from "@/lib/site";
+import { claimCopy } from "@/data/claims";
 
 /**
  * Utilitários de conteúdo do blog.
@@ -83,7 +84,7 @@ export function buildCtaHtml(kind: "mid" | "end" | "manual"): string {
     kind === "end"
       ? {
           title: "Pronto para tirar seu projeto do papel?",
-          text: "Receba uma proposta personalizada da Mavox em até 24h, sem compromisso.",
+          text: claimCopy.blogCta,
         }
       : {
           title: "Quer transformar esse conteúdo em resultado?",

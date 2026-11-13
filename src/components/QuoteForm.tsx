@@ -6,6 +6,7 @@ import { ArrowRight, Check, MessageCircle } from "lucide-react";
 import { WhatsAppLink } from "./WhatsAppLink";
 import { notify } from "@/lib/notify";
 import { trackLead } from "@/lib/analytics";
+import { claimCopy } from "@/data/claims";
 
 const field = "mt-1.5 min-h-12 w-full rounded-[var(--radius-input)] border border-paper-line bg-white px-4 py-3 text-base text-paper-ink outline-none transition focus:border-accent-ink focus:ring-2 focus:ring-accent/40";
 
@@ -34,7 +35,7 @@ export function QuoteForm({ initialService }: { initialService?: string }) {
     try {
       const res = await fetch("/api/orcamentos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();
-      if (res.ok) { setState("done"); trackLead("formulario"); notify.success("Pedido enviado! Resposta em até 24h."); }
+      if (res.ok) { setState("done"); trackLead("formulario"); notify.success(claimCopy.quoteToast); }
       else { setErrors(data.errors ?? {}); setState("error"); notify.error("Revise os campos destacados."); }
     } catch { setState("error"); }
   }
@@ -44,7 +45,7 @@ export function QuoteForm({ initialService }: { initialService?: string }) {
       <div role="status" className="rounded-[var(--radius-block)] bg-white p-10 text-center shadow-lg">
         <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-accent/15 text-accent-ink"><Check className="h-8 w-8" aria-hidden /></span>
         <h2 className="mt-5 text-2xl font-extrabold">Pedido recebido!</h2>
-        <p className="mt-2">Nossa equipe vai analisar seu briefing e enviar a proposta em até 24h. Quer acelerar? Chame a gente agora.</p>
+        <p className="mt-2">{claimCopy.quoteDone}</p>
         <WhatsAppLink message="Olá! Acabei de pedir um orçamento pelo site." className="btn btn-primary mt-6"><MessageCircle className="h-5 w-5" aria-hidden /> Falar no WhatsApp</WhatsAppLink>
       </div>
     );

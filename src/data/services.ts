@@ -1,4 +1,6 @@
-﻿export type ServiceSlug =
+﻿import { CLAIMS, claimCopy } from "./claims";
+
+export type ServiceSlug =
   | "site-institucional"
   | "landing-page"
   | "e-commerce"
@@ -37,7 +39,7 @@ export const services: Service[] = [
     ],
     deadline: "A partir de 7 dias",
     featured: true,
-    badge: "Mais pedido",
+    badge: CLAIMS.mostRequested ? claimCopy.mostRequestedBadge : undefined,
   },
   {
     slug: "gestao-redes-sociais",
@@ -72,7 +74,7 @@ export const services: Service[] = [
     slug: "e-commerce",
     icon: "cart",
     name: "Loja Virtual Completa",
-    promise: "Venda 24 horas por dia, com checkout simples que não deixa o cliente desistir.",
+    promise: "Venda a qualquer hora, com checkout simples que não deixa o cliente desistir.",
     forWho: "Quem quer vender com marca própria, sem comissão abusiva de marketplace.",
     includes: [
       "Pix, cartão e boleto integrados",
