@@ -8,6 +8,9 @@ leads_*.json
 
 .vercel
 
+test-results
+playwright-report
+
 # Segredos locais - NUNCA versionar
 .env
 .env.*

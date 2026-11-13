@@ -161,13 +161,6 @@ const jsonLdGraph = {
           name: "Brasil",
         },
       ],
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.9",
-        reviewCount: "48",
-        bestRating: "5",
-        worstRating: "1",
-      },
       sameAs: SITE.socials.map((s) => s.href),
       hasOfferCatalog: {
         "@type": "OfferCatalog",

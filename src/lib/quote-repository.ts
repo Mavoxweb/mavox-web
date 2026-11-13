@@ -1,8 +1,11 @@
 ﻿import type { QuoteRequest } from "./quote";
 import type { LeadInput } from "./lead";
+import type { GoogleAdsLeadInput } from "./google-ads-lead";
 
+import { offerById } from "@/data/google-ads";
 import { services } from "@/data/services";
-import { run, withTransaction } from "@/lib/db";
+import { queryOne, run, withTransaction } from "@/lib/db";
+import { normalizePhoneE164 } from "@/lib/lead-import";
 
 // Função auxiliar para gerar código MVX-YYYY-NNNN
 function generateCode(): string {
@@ -72,4 +75,68 @@ export async function saveLead(input: Omit<LeadInput, "website">): Promise<{ id:
   );
 
   return { id: `lead-${Date.now().toString(36)}`, persisted: true };
+}
+
+function isUniqueViolation(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  if ("code" in err && (err as { code?: string }).code === "23505") return true;
+  return "cause" in err ? isUniqueViolation((err as { cause?: unknown }).cause) : false;
+}
+
+/**
+ * Grava o lead da LP /google-ads na tabela `clients`, que é a lista do painel
+ * e a fonte de "leads recentes" do dashboard. A tabela `leads` exige e-mail
+ * (NOT NULL) e esta LP não pede e-mail, então não abrimos orçamento nem
+ * inventamos um endereço. WhatsApp repetido atualiza o cliente existente
+ * (índice único em phone_e164).
+ */
+export async function saveGoogleAdsLead(input: Omit<GoogleAdsLeadInput, "website">): Promise<{ id: string }> {
+  const offer = offerById(input.offer);
+  const phoneE164 = normalizePhoneE164(input.phone);
+  const note = `LP /google-ads (Black November). Oferta: ${offer.name} (${offer.price}). Cidade: ${input.city}.`;
+  const whatsappLink = phoneE164 ? `https://wa.me/${phoneE164.replace("+", "")}` : null;
+  const params = [input.name, input.phone, phoneE164, input.company, input.city, note, offer.service, offer.code, whatsappLink];
+
+  const insertSql = `INSERT INTO clients (
+      name, phone, phone_e164, company, city, source, intent, notes,
+      recommended_service, offer_code, whatsapp_status, whatsapp_link, sources
+    ) VALUES (
+      $1, $2, $3, $4, $5, 'google-ads', 'avaliando', $6,
+      $7, $8, 'confirmado', $9, '["google-ads"]'::jsonb
+    ) RETURNING id`;
+
+  try {
+    const created = await queryOne<{ id: string }>(insertSql, params);
+    if (!created) throw new Error("Falha ao gravar lead");
+    return { id: created.id };
+  } catch (err) {
+    if (!isUniqueViolation(err) || !phoneE164) throw err;
+    const updated = await queryOne<{ id: string }>(
+      `UPDATE clients SET
+         name = $1,
+         phone = $2,
+         company = $4,
+         city = $5,
+         source = 'google-ads',
+         intent = CASE WHEN intent = 'pronto_para_contratar' THEN intent ELSE 'avaliando' END,
+         notes = CASE
+           WHEN notes IS NULL OR btrim(notes) = '' THEN $6
+           ELSE notes || E'\\n' || $6
+         END,
+         recommended_service = $7,
+         offer_code = $8,
+         whatsapp_status = 'confirmado',
+         whatsapp_link = $9,
+         sources = CASE
+           WHEN sources @> '["google-ads"]'::jsonb THEN sources
+           ELSE sources || '["google-ads"]'::jsonb
+         END,
+         updated_at = now()
+       WHERE phone_e164 = $3
+       RETURNING id`,
+      params,
+    );
+    if (!updated) throw err;
+    return { id: updated.id };
+  }
 }

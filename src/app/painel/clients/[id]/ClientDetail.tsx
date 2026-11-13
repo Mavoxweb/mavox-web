@@ -157,6 +157,7 @@ export function ClientDetail({ clientId }: { clientId: string }) {
       case "apify": return "Apify";
       case "xlsx": return "Planilha";
       case "manual": return "Manual";
+      case "google-ads": return "Google Ads";
       default: return source;
     }
   };
@@ -167,6 +168,7 @@ export function ClientDetail({ clientId }: { clientId: string }) {
       case "apify": return "bg-violet-100 text-violet-800";
       case "xlsx": return "bg-purple-100 text-purple-800";
       case "manual": return "bg-blue-100 text-blue-800";
+      case "google-ads": return "bg-green-100 text-green-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
@@ -555,6 +557,7 @@ export function ClientDetail({ clientId }: { clientId: string }) {
                     >
                       <option value="manual">Manual</option>
                       <option value="site">Site</option>
+                      <option value="google-ads">Google Ads</option>
                     </select>
                   </div>
                   <div>

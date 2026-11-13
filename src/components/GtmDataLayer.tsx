@@ -60,7 +60,21 @@ export default function GtmDataLayer() {
       const target = event.target as HTMLElement | null;
       const link = target?.closest("a[href*='wa.me']") as HTMLAnchorElement | null;
       if (link) {
-        pushEvent({ event: "whatsapp_click", url: link.href, text: link.textContent?.trim() || "" });
+        pushEvent({
+          event: "whatsapp_click",
+          url: link.href,
+          text: link.textContent?.trim() || link.getAttribute("aria-label") || "",
+          button_location: link.dataset.trackLocation || "link",
+        });
+      }
+      const tel = target?.closest("a[href^='tel:']") as HTMLAnchorElement | null;
+      if (tel) {
+        pushEvent({
+          event: "phone_click",
+          url: tel.href,
+          text: tel.textContent?.trim() || tel.getAttribute("aria-label") || "",
+          button_location: tel.dataset.trackLocation || "link",
+        });
       }
     };
 

@@ -40,6 +40,31 @@ p { text-wrap: pretty; }
 /* Superfícies: definem cor de título e texto de forma consistente (contraste AA) */
 .surface-dark { --heading: var(--color-fg); color: var(--color-fg-muted); background: var(--color-bg); }
 .surface-navy { --heading: var(--color-fg); color: var(--color-fg-muted); background: var(--color-surface); }
+
+/* LP /google-ads: cores oficiais do manual. Gilroy não entra — a licença pede webfont da Fontspring e o kit só tem TTF de desktop. A página usa Sora e Roboto, já servidas pelo site. */
+.ads-brand {
+  --color-bg: #1a1548;
+  --color-surface: #1a1548;
+  --color-surface-2: #0085c6;
+  --color-accent: #4cb748;
+  --color-accent-hover: #5dcc59;
+  --color-accent-ink: #1a1548;
+  --color-paper-ink: #1a1548;
+  --color-paper-line: rgb(26 21 72 / 0.14);
+}
+.ads-brand .btn-primary { box-shadow: 0 1px 0 rgb(255 255 255 / .35) inset, 0 8px 24px -8px rgb(76 183 72 / .55); }
+.ads-brand .glass { background: rgb(26 21 72 / .96); }
+.ads-hero {
+  --heading: #fff;
+  color: rgb(255 255 255 / 0.88);
+  background-color: #1a1548;
+  background-image: linear-gradient(115deg, #1a1548 0%, #1a1548 46%, #0085c6 100%);
+}
+.ads-green {
+  --heading: #1a1548;
+  color: #1a1548;
+  background-image: linear-gradient(135deg, #4cb748 0%, #00977a 100%);
+}
 .surface-light { --heading: var(--color-paper-ink); color: var(--color-paper-muted); background: #fff; }
 .surface-paper { --heading: var(--color-paper-ink); color: var(--color-paper-muted); background: var(--color-paper); }
 

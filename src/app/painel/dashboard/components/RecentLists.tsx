@@ -102,6 +102,7 @@ function getSourcePillClass(source: string | null) {
 function getSourceLabel(source: string | null) {
   switch (source) {
     case "site": return "Site";
+    case "google-ads": return "Google Ads";
     case "manual": return "Manual";
     case "apify": return "Importado";
     case "google_maps": return "Google";
