@@ -38,12 +38,12 @@ export function Footer() {
           </ul>
         </nav>
 
-        <div>
+        <div className="min-w-0">
           <h2 className="font-display text-base font-bold text-white">Contato & Legal</h2>
           <ul className="mt-3 space-y-3">
-            <li className="flex gap-2.5"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden />{SITE.address}</li>
-            <li className="flex gap-2.5"><Phone className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden /><a href={SITE.phoneHref} className="[@media(hover:hover)]:hover:text-white">{SITE.phone}</a></li>
-            {SITE.emails.map((e) => <li key={e} className="flex gap-2.5"><Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden /><a href={`mailto:${e}`} className="[@media(hover:hover)]:hover:text-white">{e}</a></li>)}
+            <li className="flex min-w-0 gap-2.5"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden /><span className="min-w-0 [overflow-wrap:anywhere]">{SITE.address}</span></li>
+            <li className="flex min-w-0 gap-2.5"><Phone className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden /><a href={SITE.phoneHref} className="min-w-0 [overflow-wrap:anywhere] [@media(hover:hover)]:hover:text-white">{SITE.phone}</a></li>
+            {SITE.emails.map((e) => <li key={e} className="flex min-w-0 gap-2.5"><Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden /><a href={`mailto:${e}`} className="min-w-0 [overflow-wrap:anywhere] [@media(hover:hover)]:hover:text-white">{e}</a></li>)}
           </ul>
           <ul className="mt-6 space-y-1">
             <li><Link href="/privacidade" className="inline-flex min-h-11 items-center text-xs [@media(hover:hover)]:hover:text-white">Política de Privacidade</Link></li>

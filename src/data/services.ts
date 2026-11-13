@@ -100,7 +100,7 @@ export const services: Service[] = [
     slug: "trafego-marketing",
     icon: "chart",
     name: "Tráfego Pago que Gera Clientes",
-    promise: "Coloque sua frente de quem já procura por ela, todos os dias, e pague só pelo que funciona.",
+    promise: "Coloque sua empresa na frente de quem já procura por ela, todos os dias.",
     forWho: "Quem já tem site e quer previsibilidade de novos clientes.",
     includes: [
       "Campanhas no Google e Meta Ads",

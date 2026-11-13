@@ -96,9 +96,10 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link
             href="/orcamento"
-            className="btn btn-primary hidden !min-h-11 !px-5 !py-2 text-sm sm:inline-flex shadow-lg"
+            className="btn btn-primary !min-h-11 !px-3 !py-2 text-sm shadow-lg sm:!px-5"
           >
-            Pedir orçamento grátis
+            <span className="sm:hidden">Orçamento</span>
+            <span className="hidden sm:inline">Pedir orçamento grátis</span>
           </Link>
 
           <Dialog.Root open={open} onOpenChange={setOpen}>

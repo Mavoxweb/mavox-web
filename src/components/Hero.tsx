@@ -1,8 +1,6 @@
 ﻿import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
-import { HeroVisualLazy } from "./HeroVisualLazy";
-import { MetricsPanel } from "./MetricsPanel";
-import { metrics } from "@/data/clients";
+import { HeroShowcase } from "./HeroShowcase";
 
 const assurances = ["Sem compromisso", "Resposta em até 24h", "Você é dono do site"];
 
@@ -19,7 +17,7 @@ export function Hero() {
             <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden /> Agência de desenvolvimento e marketing digital
           </p>
           <h1 className="t-h1 mt-6 text-white">
-            Seu site deveria trazer clientes. <span className="font-semibold opacity-60">O nosso traz.</span>
+            Seu site deveria trazer clientes. <span className="text-accent">O nosso traz.</span>
           </h1>
           <p className="t-lead mt-6 max-w-xl">
             Sites, lojas e sistemas pensados para uma coisa só: gerar contatos e aumentar o faturamento da sua empresa. Sem enrolação e com proposta em até 24h.
@@ -34,9 +32,8 @@ export function Hero() {
             ))}
           </ul>
         </div>
-        <HeroVisualLazy />
+        <HeroShowcase />
       </div>
-      <MetricsPanel metrics={metrics} />
     </section>
   );
 }

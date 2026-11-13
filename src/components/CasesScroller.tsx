@@ -1,43 +1,63 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { PortfolioCase } from "@/data/cases";
+import { CaseArticle } from "./CaseArticle";
 
-export function CasesScroller({
-  labels,
-  children,
-}: {
-  labels: string[];
-  children: ReactNode;
-}) {
-  const ref = useRef<HTMLUListElement>(null);
+const EAGER_COUNT = 2;
+
+export function CasesScroller({ items }: { items: PortfolioCase[] }) {
   const [idx, setIdx] = useState(0);
+  const startX = useRef<number | null>(null);
+  const region = useRef<HTMLDivElement>(null);
 
   const go = (next: number) => {
-    const list = ref.current;
-    const child = list?.children[next] as HTMLElement | undefined;
-    if (!list || !child) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const left = child.getBoundingClientRect().left - list.getBoundingClientRect().left + list.scrollLeft;
-    list.scrollTo({ left, behavior: reduce ? "auto" : "smooth" });
-    setIdx(next);
+    setIdx(Math.max(0, Math.min(items.length - 1, next)));
   };
 
+  useEffect(() => {
+    const urls = [items[idx], items[idx + 1]]
+      .flatMap((item) => [item?.desktop?.src, item?.mobile?.src])
+      .filter((src): src is string => !!src);
+    for (const src of urls) {
+      const img = new Image();
+      img.src = src;
+    }
+  }, [idx, items]);
+
   return (
-    <div>
-      <ul
-        ref={ref}
-        className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] lg:flex-col lg:gap-16 lg:overflow-visible"
-        onScroll={(e) => {
-          if (window.matchMedia("(min-width: 1024px)").matches) return;
-          const list = e.currentTarget;
-          const slide = list.firstElementChild?.clientWidth || list.clientWidth || 1;
-          setIdx(Math.max(0, Math.min(labels.length - 1, Math.round(list.scrollLeft / slide))));
-        }}
-      >
-        {children}
-      </ul>
-      <div className="mt-5 flex flex-nowrap items-center justify-center gap-1 lg:hidden">
+    <div
+      ref={region}
+      className="lg:hidden"
+      data-testid="cases-carousel"
+      aria-roledescription="carrossel"
+      onTouchStart={(e) => {
+        startX.current = e.changedTouches[0]?.clientX ?? null;
+      }}
+      onTouchEnd={(e) => {
+        if (startX.current == null) return;
+        const dx = (e.changedTouches[0]?.clientX ?? startX.current) - startX.current;
+        startX.current = null;
+        if (dx < -40) go(idx + 1);
+        else if (dx > 40) go(idx - 1);
+      }}
+    >
+      <div className="relative">
+        <div data-testid="case-slide" data-slide={idx}>
+          <CaseArticle item={items[idx]} eager />
+        </div>
+        {items.map((item, i) => {
+          const preload = i !== idx && (i < EAGER_COUNT || i === idx + 1);
+          if (!preload) return null;
+          return (
+            <div key={item.title} aria-hidden className="pointer-events-none fixed top-0 left-0 -z-10 w-full max-w-3xl invisible">
+              <CaseArticle item={item} eager />
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-5 flex flex-nowrap items-center justify-center gap-1">
         <button
           type="button"
           className="icon-btn shrink-0 border border-paper-line text-paper-ink disabled:opacity-40"
@@ -48,11 +68,11 @@ export function CasesScroller({
           <ChevronLeft className="h-5 w-5" aria-hidden />
         </button>
         <div role="group" aria-label="Escolher projeto" className="flex items-center">
-          {labels.map((label, i) => (
+          {items.map((item, i) => (
             <button
-              key={label}
+              key={item.title}
               type="button"
-              aria-label={`Mostrar ${label}`}
+              aria-label={`Mostrar ${item.title}`}
               aria-current={i === idx ? "true" : undefined}
               onClick={() => go(i)}
               className="grid h-11 w-7 shrink-0 place-items-center"
@@ -65,7 +85,7 @@ export function CasesScroller({
           type="button"
           className="icon-btn shrink-0 border border-paper-line text-paper-ink disabled:opacity-40"
           aria-label="Próximo projeto"
-          disabled={idx === labels.length - 1}
+          disabled={idx === items.length - 1}
           onClick={() => go(idx + 1)}
         >
           <ChevronRight className="h-5 w-5" aria-hidden />

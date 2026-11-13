@@ -33,7 +33,7 @@
   --gradient-green: linear-gradient(120deg, #4cb748, #00977a);
 }
 
-html { scroll-behavior: smooth; scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; overflow-x: clip; }
 body { font-family: var(--font-sans); color: var(--color-paper-muted); background: #fff; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: clip; }
 h1, h2, h3, h4 { font-family: var(--font-display); color: var(--heading); text-wrap: balance; }
 p { text-wrap: pretty; }
@@ -69,6 +69,9 @@ p { text-wrap: pretty; }
   .btn-outline-dark:hover { border-color: var(--color-surface); }
 }
 .icon-btn { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 999px; transition: transform .1s ease-out, background-color .2s; touch-action: manipulation; }
+@media (min-width: 64rem) {
+  .icon-btn.lg\:hidden { display: none; }
+}
 .icon-btn:active { transform: scale(.94); }
 
 /* Sombras em camadas */
