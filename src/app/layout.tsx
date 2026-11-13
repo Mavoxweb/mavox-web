@@ -7,6 +7,7 @@ import { Floating } from "@/components/Floating";
 import { PixelTracker } from "@/components/PixelTracker";
 import GtmDataLayer from "@/components/GtmDataLayer";
 import { getActivePixelConfigs } from "@/lib/pixels-repository";
+import { claimCopy } from "@/data/claims";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -22,8 +23,7 @@ const roboto = Roboto({
 });
 
 const title = "Mavox | Criação de Sites, Lojas Virtuais e Tráfego Pago no Rio de Janeiro";
-const description =
-  "Agência de tecnologia e marketing digital no Rio de Janeiro (Copacabana). Especialistas em sites institucionais, landing pages de alta conversão, e-commerce e tráfego pago (Google Ads e Meta Ads). Proposta grátis em até 24h.";
+const description = claimCopy.metaDescription;
 const schemaDescription = description.replace(/\s*Proposta grátis em até 24h\.?/, "").trim();
 
 export const metadata: Metadata = {
@@ -102,7 +102,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#110c38",
+  themeColor: "#1A1548",
   viewportFit: "cover",
   width: "device-width",
   initialScale: 1,

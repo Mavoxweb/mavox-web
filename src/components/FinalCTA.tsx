@@ -1,4 +1,5 @@
 ﻿import { Check, MessageCircle } from "lucide-react";
+import { CLAIMS, claimCopy } from "@/data/claims";
 import { LeadForm } from "./LeadForm";
 import { WhatsAppLink } from "./WhatsAppLink";
 
@@ -8,11 +9,13 @@ export function FinalCTA() {
       <div aria-hidden className="absolute left-1/2 top-0 -z-10 h-72 w-[44rem] max-w-full -translate-x-1/2 rounded-full bg-accent/12 blur-3xl" />
       <div className="container-x grid items-center gap-12 lg:grid-cols-[1.1fr_.9fr] lg:gap-16">
         <div>
-          <p className="inline-flex items-center gap-2 text-sm font-medium text-white"><span className="h-2 w-2 rounded-full bg-accent" aria-hidden /> Agenda de novos projetos limitada neste mês</p>
-          <h2 id="cta-title" className="t-h2 mt-4 !text-white">Cada dia sem estratégia digital é cliente indo para o concorrente.</h2>
-          <p className="t-lead mt-5 max-w-xl">Conte sobre o seu negócio e receba, em até 24h, uma proposta clara com escopo, prazo e investimento. Sem compromisso e sem pegadinhas.</p>
+          {CLAIMS.limitedAgenda ? (
+            <p className="inline-flex items-center gap-2 text-sm font-medium text-white"><span className="h-2 w-2 rounded-full bg-accent" aria-hidden /> {claimCopy.agenda}</p>
+          ) : null}
+          <h2 id="cta-title" className={`t-h2 !text-white ${CLAIMS.limitedAgenda ? "mt-4" : ""}`}>Cada dia sem estratégia digital é cliente indo para o concorrente.</h2>
+          <p className="t-lead mt-5 max-w-xl">{claimCopy.finalLead}</p>
           <ul className="mt-6 space-y-2.5 text-white">
-            {["Diagnóstico inicial gratuito", "Proposta detalhada em até 24h", "Você só avança quando aprova"].map((t) => (
+            {["Diagnóstico inicial gratuito", claimCopy.finalPoint, "Você só avança quando aprova"].map((t) => (
               <li key={t} className="flex gap-3"><Check className="mt-1 h-5 w-5 shrink-0 text-accent" aria-hidden />{t}</li>
             ))}
           </ul>

@@ -2,20 +2,21 @@
 
 @theme {
   /* Tokens de design */
-  --color-bg: #110c38;
-  --color-surface: #1a1450;
-  --color-surface-2: #241c6b;
+  --color-bg: #1a1548; /* navy da marca */
+  --color-surface: #26205f;
+  --color-surface-2: #312a78;
   --color-fg: #ffffff;
   --color-fg-muted: rgb(255 255 255 / 0.74);
-  --color-accent: #47b749;
-  --color-accent-hover: #5bc85d;
-  --color-accent-ink: #2a7a2d; /* verde legível sobre fundo claro (AA) */
+  --color-accent: #4cb748; /* verde da marca */
+  --color-accent-hover: #5ec45a;
+  /* #4CB748 em texto pequeno sobre branco fica abaixo de AA; este tom mais escuro segura o contraste. */
+  --color-accent-ink: #1f7a32;
   --color-line: rgb(255 255 255 / 0.12);
   --color-danger: #e5484d;
   --color-paper: #f4f6fb;
   --color-paper-ink: #0f0f2a;
   --color-paper-muted: #4a4f5e;
-  --color-paper-line: rgb(26 20 80 / 0.12);
+  --color-paper-line: rgb(26 21 72 / 0.12);
 
   --font-display: var(--font-sora), "Segoe UI", sans-serif;
   --font-sans: var(--font-roboto), Arial, sans-serif;
@@ -28,9 +29,11 @@
 :root {
   --heading: var(--color-paper-ink);
   --header-h: 72px;
+  --gradient-navy: linear-gradient(120deg, #1a1548, #0085c6);
+  --gradient-green: linear-gradient(120deg, #4cb748, #00977a);
 }
 
-html { scroll-behavior: smooth; scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; overflow-x: clip; }
 body { font-family: var(--font-sans); color: var(--color-paper-muted); background: #fff; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: clip; }
 h1, h2, h3, h4 { font-family: var(--font-display); color: var(--heading); text-wrap: balance; }
 p { text-wrap: pretty; }
@@ -122,6 +125,9 @@ p { text-wrap: pretty; }
   .btn-outline-dark:hover { border-color: var(--color-surface); }
 }
 .icon-btn { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 999px; transition: transform .1s ease-out, background-color .2s; touch-action: manipulation; }
+@media (min-width: 64rem) {
+  .icon-btn.lg\:hidden { display: none; }
+}
 .icon-btn:active { transform: scale(.94); }
 
 /* Sombras em camadas */
@@ -154,7 +160,7 @@ p { text-wrap: pretty; }
   .glass { background: var(--color-bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
 }
 @media (prefers-contrast: more) {
-  :root { --color-fg-muted: #fff; --color-paper-muted: #2b2f3a; --color-line: rgb(255 255 255 / .5); --color-paper-line: rgb(26 20 80 / .55); }
+  :root { --color-fg-muted: #fff; --color-paper-muted: #2b2f3a; --color-line: rgb(255 255 255 / .5); --color-paper-line: rgb(26 21 72 / .55); }
   .btn-ghost { border-color: #fff; }
 }
 
@@ -165,6 +171,7 @@ p { text-wrap: pretty; }
 
 /* Adia layout/pintura de seções abaixo da dobra (melhora TBT/INP) */
 main > section:not(#hero) { content-visibility: auto; contain-intrinsic-size: auto 900px; }
+#cases { contain-intrinsic-size: auto 4200px; }
 
 /* ==========================================================================
    Mavox Admin Panel - Pivora CRM Inspired Theme

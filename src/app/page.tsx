@@ -1,4 +1,5 @@
 ﻿import { Header } from "@/components/Header";
+import { PromoBanner } from "@/components/PromoBanner";
 import { Hero } from "@/components/Hero";
 import { ClientsStrip } from "@/components/ClientsStrip";
 import { Pains } from "@/components/Pains";
@@ -10,19 +11,18 @@ import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
 import { FinalCTA } from "@/components/FinalCTA";
 import { Footer } from "@/components/Footer";
-import { metrics, showClients } from "@/data/clients";
 
 export default function Home() {
   return (
     <>
+      <PromoBanner />
       <Header />
       <main id="main">
         <Hero />
-        {metrics.length > 0 && <div aria-hidden className={`h-12 sm:h-14 ${showClients ? "surface-light" : "surface-paper"}`} />}
-        <ClientsStrip />
         <Pains />
-        <Services />
         <Cases />
+        <ClientsStrip />
+        <Services />
         <Process />
         <About />
         <Testimonials />

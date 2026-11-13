@@ -47,8 +47,8 @@ export function Header() {
       className="sticky top-0 z-50 text-white transition-all duration-300 border-b border-white/10 shadow-md"
       style={{
         backgroundColor: scrolled
-          ? "rgba(18, 12, 56, 0.96)"
-          : "#120c38",
+          ? "rgb(26 21 72 / 0.96)"
+          : "#1A1548",
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
         ["--header-h" as string]: scrolled ? "60px" : "72px",
@@ -96,9 +96,10 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link
             href="/orcamento"
-            className="btn btn-primary hidden !min-h-11 !px-5 !py-2 text-sm sm:inline-flex shadow-lg"
+            className="btn btn-primary !min-h-11 !px-3 !py-2 text-sm shadow-lg sm:!px-5"
           >
-            Pedir orçamento grátis
+            <span className="sm:hidden">Orçamento</span>
+            <span className="hidden sm:inline">Pedir orçamento grátis</span>
           </Link>
 
           <Dialog.Root open={open} onOpenChange={setOpen}>
@@ -112,7 +113,7 @@ export function Header() {
               <Dialog.Overlay className="fixed inset-0 z-[60] bg-black/60 data-[state=open]:animate-[fade_.2s_ease-out]" />
               <Dialog.Content
                 aria-describedby={undefined}
-                className="fixed inset-y-0 right-0 z-[70] flex w-[min(22rem,90vw)] flex-col p-5 shadow-float bg-[#120c38] text-white border-l border-white/10 data-[state=open]:animate-[slide_.35s_cubic-bezier(.32,.72,0,1)]"
+                className="fixed inset-y-0 right-0 z-[70] flex w-[min(22rem,90vw)] flex-col p-5 shadow-float bg-bg text-white border-l border-white/10 data-[state=open]:animate-[slide_.35s_cubic-bezier(.32,.72,0,1)]"
                 style={{
                   paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))",
                 }}
