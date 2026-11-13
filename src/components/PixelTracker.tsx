@@ -162,7 +162,7 @@ export function PixelTracker({
             dataLayer.push = function() {
               for (var i = 0; i < arguments.length; i++) {
                 var item = arguments[i];
-                if (item && item.event) {
+                if (item && item.event && window.location.pathname.indexOf("/painel") === 0) {
                   window._mavoxPixelLog(item.event, 'gtm', '', item);
                 }
               }

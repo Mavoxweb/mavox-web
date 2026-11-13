@@ -1,5 +1,18 @@
 export const GOOGLE_ADS_PATH = "/google-ads";
 
+/**
+ * Textos da campanha num lugar só. O dono ainda confirma prazo e pagamento.
+ * Troque aqui para atualizar hero, cards, FAQ e mensagens de WhatsApp.
+ */
+export const CAMPAIGN = {
+  deadlineLabel: "Black November · até 30/11",
+  paymentLabel: "Pagamento no PIX",
+  comboReturns: "Depois de 30/11 o combo volta a R$ 1.500",
+} as const;
+
+/** Nome do fundador ainda não confirmado. Não preencher com um nome inventado. */
+export const FOUNDER_NAME = "";
+
 export type OfferId = "combo" | "site" | "ads";
 
 export type Offer = {
@@ -18,15 +31,15 @@ export type Offer = {
 export const offers: readonly Offer[] = [
   {
     id: "combo",
-    name: "Combo site + Google Ads",
+    name: "Site profissional + configuração da campanha no Google Ads",
     price: "R$ 800",
     compareAt: "R$ 1.500",
-    detail: "Oferta de entrada da Black November. Site profissional com setup e gestão de Google Ads.",
-    includes: ["Site profissional", "Configuração do Google Ads", "Gestão dos anúncios"],
+    detail: "Site profissional e a configuração da campanha de pesquisa no Google Ads.",
+    includes: ["Site profissional", "Configuração da campanha no Google Ads"],
     code: "black-november-combo-800",
-    service: "Combo site + Google Ads",
+    service: "Site profissional + configuração da campanha no Google Ads",
     featured: true,
-    badge: "Black November",
+    badge: CAMPAIGN.deadlineLabel,
   },
   {
     id: "site",
@@ -39,12 +52,12 @@ export const offers: readonly Offer[] = [
   },
   {
     id: "ads",
-    name: "Só Google Ads",
+    name: "Configuração da campanha no Google Ads",
     price: "R$ 950",
-    detail: "Setup e gestão de Google Ads para quem já tem onde receber o clique.",
-    includes: ["Configuração do Google Ads", "Gestão dos anúncios"],
+    detail: "Configuração única da campanha. A verba dos anúncios é paga direto ao Google.",
+    includes: ["Configuração da campanha no Google Ads"],
     code: "google-ads-950",
-    service: "Google Ads",
+    service: "Configuração da campanha no Google Ads",
   },
 ] as const;
 
@@ -54,15 +67,14 @@ export function offerById(id: OfferId): Offer {
   return offer;
 }
 
-export const founderBrands = [
-  "Reserva",
-  "Domino's",
-  "Mercedes",
-  "Dalia",
-  "Stone",
-  "Amazon",
-  "Americanas",
-] as const;
+export const founderBrands = ["Reserva", "Domino's", "Mercedes", "Stone", "Amazon", "Americanas"] as const;
+
+export function founderSentence() {
+  const brands = `${founderBrands.slice(0, -1).join(", ")} e ${founderBrands.at(-1)}`;
+  const name = FOUNDER_NAME.trim();
+  const who = name ? `${name}, fundador da Mavox,` : "O fundador da Mavox";
+  return `${who} tem +164 projetos entregues e já trabalhou com marcas como ${brands}.`;
+}
 
 export const pains = [
   {
@@ -81,34 +93,38 @@ export const pains = [
 
 export const steps = [
   { title: "Você chama", text: "Manda uma mensagem no WhatsApp ou envia nome, WhatsApp, empresa e cidade no formulário." },
-  { title: "A gente alinha", text: "Entendemos o negócio, a cidade e qual oferta faz sentido: combo, só site ou só Google Ads." },
-  { title: "Colocamos no ar", text: "O site entra no ar e, na oferta com anúncios, a campanha de Google Ads é configurada e acompanhada." },
+  { title: "A gente alinha", text: "Entendemos o negócio, a cidade e qual oferta faz sentido: combo, só site ou só a configuração da campanha." },
+  { title: "Colocamos no ar", text: "O site entra no ar e, na oferta com anúncios, a campanha de Google Ads é configurada." },
 ] as const;
 
 export const faq = [
   {
     q: "O que está incluso no combo de R$ 800?",
-    a: "Site profissional, configuração do Google Ads e gestão dos anúncios. O valor cheio dessa combinação é R$ 1.500. R$ 800 é o preço de Black November.",
+    a: "Site profissional e a configuração da campanha no Google Ads. O valor cheio dessa combinação é R$ 1.500. Até 30/11 ela sai por R$ 800.",
   },
   {
     q: "A verba dos anúncios está inclusa?",
-    a: "Não. Os preços desta página são o serviço da Mavox. O valor que o Google cobra por clique é pago direto na conta de anúncios, à parte.",
+    a: "Não. Os preços desta página são o serviço da Mavox. A verba dos anúncios é paga direto ao Google.",
+  },
+  {
+    q: "Por que o combo sai mais barato que só o Ads?",
+    a: `Até 30/11, o combo reúne o site profissional e a configuração da campanha por R$ 800. A configuração da campanha sozinha é R$ 950. ${CAMPAIGN.comboReturns}.`,
+  },
+  {
+    q: "Como é o pagamento?",
+    a: `${CAMPAIGN.paymentLabel}. ${CAMPAIGN.comboReturns}.`,
   },
   {
     q: "O site de R$ 499 inclui domínio e hospedagem?",
     a: "Sim. A oferta de só o site inclui hospedagem e domínio .com.br.",
   },
   {
-    q: "Posso contratar só o Google Ads?",
-    a: "Sim. Setup e gestão de Google Ads saem por R$ 950, para quem já tem um site para receber a visita.",
+    q: "O que é a oferta de R$ 950?",
+    a: "É a configuração única da campanha no Google Ads, para quem já tem um site. A verba dos anúncios é paga direto ao Google.",
   },
   {
     q: "Em quanto tempo começa?",
-    a: "O prazo é combinado no atendimento, depois de vermos o negócio e a cidade. Não há um prazo único publicado para esta campanha.",
-  },
-  {
-    q: "Reserva, Domino's, Mercedes e as outras marcas são clientes da Mavox?",
-    a: "Não. Essas marcas aparecem só como experiência do fundador. Não são clientes da Mavox e não devem ser lidas como portfólio da agência.",
+    a: "O início é combinado no atendimento, depois de vermos o negócio e a cidade.",
   },
   {
     q: "Como vocês usam meus dados?",
@@ -117,14 +133,14 @@ export const faq = [
 ] as const;
 
 const offerLine: Record<OfferId, string> = {
-  combo: "o combo site + Google Ads por R$ 800",
+  combo: "o combo de site profissional e configuração da campanha no Google Ads por R$ 800",
   site: "só o site por R$ 499",
-  ads: "só o Google Ads por R$ 950",
+  ads: "a configuração da campanha no Google Ads por R$ 950",
 };
 
 export function waText(offer: OfferId | "floating" | "success" = "combo") {
   if (offer === "floating") {
-    return "Olá! Vim pelo anúncio da Mavox (Black November) e quero o combo site + Google Ads por R$ 800.";
+    return "Olá! Vim pelo anúncio da Mavox (Black November) e quero o combo de site + configuração da campanha no Google Ads por R$ 800.";
   }
   if (offer === "success") {
     return "Olá! Acabei de enviar o formulário da campanha Black November da Mavox.";

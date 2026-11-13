@@ -1,14 +1,18 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check, MapPin, MessageCircle, Phone, Search, Store } from "lucide-react";
 import { AdsForm } from "@/components/google-ads/AdsForm";
+import { HeroMockup } from "@/components/google-ads/HeroMockup";
+import { PortfolioCases } from "@/components/google-ads/PortfolioCases";
 import { WhatsAppLink } from "@/components/WhatsAppLink";
-import { faq, founderBrands, GOOGLE_ADS_PATH, offers, pains, steps, waMessage } from "@/data/google-ads";
+import { CAMPAIGN, faq, founderSentence, GOOGLE_ADS_PATH, offers, pains, steps, waMessage } from "@/data/google-ads";
 import { SITE } from "@/lib/site";
 
-const title = "Site + Google Ads por R$ 800 na Black November";
-const description = "Combo de site profissional com setup e gestão de Google Ads por R$ 800 (de R$ 1.500) para negócios locais. Também há só o site por R$ 499 e só Google Ads por R$ 950.";
+const title = "Seu negócio aparecendo no Google: site + anúncios por R$ 800";
+const description = "Site profissional e configuração da campanha no Google Ads por R$ 800 até 30/11. Só o site por R$ 499. Configuração da campanha por R$ 950. Pagamento no PIX.";
+
+export const viewport: Viewport = { themeColor: "#1A1548" };
 
 export const metadata: Metadata = {
   title,
@@ -63,43 +67,32 @@ export default function GoogleAdsLandingPage() {
       </header>
 
       <main id="main">
-        <section id="hero" className="ads-hero relative overflow-hidden">
-          <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 hidden w-[38%] bg-[linear-gradient(160deg,#1A1548_0%,#0085C6_100%)] lg:block" />
-          <div className="container-x relative grid items-center gap-10 py-12 lg:grid-cols-[1.15fr_.85fr] lg:py-20">
+        <section id="hero" className="ads-hero">
+          <div className="container-x grid items-center gap-10 py-12 lg:grid-cols-[1.15fr_.85fr] lg:py-20">
             <div>
-              <p className="inline-flex items-center gap-2 rounded-full border border-line bg-white/5 px-3.5 py-1.5 text-sm font-medium text-white">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden /> Black November
+              <p className="inline-flex items-center gap-2 rounded-full border border-line bg-white/5 px-3.5 py-1.5 text-base font-medium text-white">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden /> {CAMPAIGN.deadlineLabel}
               </p>
-              <h1 className="t-h1 mt-5 text-white">Site profissional e Google Ads para o seu negócio local</h1>
+              <h1 className="t-h1 mt-5 text-white">Seu negócio aparecendo no Google: site + anúncios por R$ 800</h1>
               <p className="t-lead mt-5 max-w-xl">
-                A Mavox faz o site e cuida da campanha de pesquisa no Google. A oferta de entrada é o combo por <strong className="font-bold text-white">R$ 800</strong>.
+                Site profissional e a configuração da campanha de pesquisa no Google. A oferta de entrada é o combo por <strong className="font-bold text-white">R$ 800</strong>.
               </p>
-              <p className="mt-6 text-sm text-white">De <s>R$ 1.500</s></p>
+              <p className="mt-6 text-base text-white">De <s>R$ 1.500</s></p>
               <p className="font-display text-5xl font-extrabold tabular text-accent sm:text-6xl">R$ 800</p>
-              <p className="mt-1 text-white">combo site + setup e gestão de Google Ads</p>
+              <p className="mt-1 text-base text-white">Site profissional + configuração da campanha no Google Ads</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <WhatsAppLink leadEvent={false} message={waMessage.hero} data-track-location="hero" className="btn btn-primary">
                   <MessageCircle className="h-5 w-5" aria-hidden /> Chamar no WhatsApp
                 </WhatsAppLink>
                 <a href="#formulario" className="btn btn-ghost">Enviar meus dados <ArrowRight className="h-5 w-5" aria-hidden /></a>
               </div>
-              <ul className="mt-6 flex flex-col gap-2 text-sm text-white">
-                {["Atendimento humano no WhatsApp", "Para negócios locais", "Também dá para contratar só o site ou só os anúncios"].map((item) => (
+              <ul className="mt-6 flex flex-col gap-2 text-base text-white">
+                {[CAMPAIGN.paymentLabel, CAMPAIGN.comboReturns, "A verba dos anúncios é paga direto ao Google"].map((item) => (
                   <li key={item} className="inline-flex items-center gap-2"><Check className="h-4 w-4 shrink-0 text-accent" aria-hidden />{item}</li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-[var(--radius-block)] bg-[linear-gradient(160deg,#1A1548_0%,#0085C6_100%)] p-[2px] lg:bg-none lg:p-0">
-            <div className="rounded-[calc(var(--radius-block)-2px)] border border-white/15 bg-[#1A1548] p-6 sm:p-8 lg:rounded-[var(--radius-block)]">
-              <h2 className="font-display text-xl font-bold text-white">O que o combo resolve</h2>
-              <ul className="mt-5 space-y-4 text-sm">
-                {offers[0].includes.map((item) => (
-                  <li key={item} className="flex gap-3 text-white"><Check className="mt-0.5 h-5 w-5 shrink-0 text-accent" aria-hidden />{item}</li>
-                ))}
-              </ul>
-              <p className="mt-6 text-sm text-white/85">A verba que o Google cobra pelos cliques fica fora desse valor e é paga direto na conta de anúncios.</p>
-            </div>
-            </div>
+            <HeroMockup />
           </div>
         </section>
 
@@ -121,34 +114,13 @@ export default function GoogleAdsLandingPage() {
           </div>
         </section>
 
-        <section aria-labelledby="incluso-title" className="surface-light section-y">
-          <div className="container-x grid gap-10 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
-            <div>
-              <h2 id="incluso-title" className="t-h2">O que entra em cada oferta</h2>
-              <p className="t-lead mt-4">O escopo abaixo é o que esta campanha vende.</p>
-            </div>
-            <ul className="grid gap-4">
-              {offers.map((offer) => (
-                <li key={offer.id} className="rounded-[var(--radius-card)] border border-paper-line bg-paper p-5">
-                  <p className="font-display text-lg font-bold text-paper-ink">{offer.name} · {offer.price}</p>
-                  <ul className="mt-3 space-y-2">
-                    {offer.includes.map((item) => (
-                      <li key={item} className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden />{item}</li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        <section aria-labelledby="como-title" className="surface-paper section-y">
+        <section aria-labelledby="como-title" className="surface-light section-y">
           <div className="container-x">
             <h2 id="como-title" className="t-h2 max-w-3xl">Como funciona</h2>
             <ol className="mt-10 grid gap-6 md:grid-cols-3">
               {steps.map((step, index) => (
                 <li key={step.title} className="rounded-[var(--radius-card)] bg-white p-6 shadow-card">
-                  <span className="font-display text-sm font-bold text-accent-ink">0{index + 1}</span>
+                  <span className="font-display text-base font-bold text-accent-ink">0{index + 1}</span>
                   <h3 className="t-h3 mt-3">{step.title}</h3>
                   <p className="mt-2 text-[15px]">{step.text}</p>
                 </li>
@@ -167,14 +139,15 @@ export default function GoogleAdsLandingPage() {
                   <div className={offer.featured ? "ads-green px-6 pb-5 pt-6" : "px-6 pt-6"}>
                     {offer.badge && <p className="text-xs font-bold uppercase tracking-widest">{offer.badge}</p>}
                     <h3 className="t-h3 mt-2">{offer.name}</h3>
-                    {offer.compareAt && <p className="mt-4 text-sm">De <s>{offer.compareAt}</s></p>}
+                    {offer.compareAt && <p className="mt-4 text-base">De <s>{offer.compareAt}</s></p>}
                     <p className={`font-display text-4xl font-extrabold tabular text-paper-ink ${offer.compareAt ? "" : "mt-4"}`}>{offer.price}</p>
+                    {offer.featured ? <p className="mt-2 text-base font-medium">{CAMPAIGN.comboReturns}</p> : null}
                   </div>
                   <div className="flex flex-1 flex-col px-6 pb-6">
-                  <p className="mt-4 text-sm">{offer.detail}</p>
+                  <p className="mt-4 text-base">{offer.detail}</p>
                   <ul className="mt-5 space-y-2">
                     {offer.includes.map((item) => (
-                      <li key={item} className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden />{item}</li>
+                      <li key={item} className="flex gap-2 text-base"><Check className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden />{item}</li>
                     ))}
                   </ul>
                   <div className="mt-6 grid gap-2">
@@ -190,23 +163,12 @@ export default function GoogleAdsLandingPage() {
           </div>
         </section>
 
+        <PortfolioCases />
+
         <section aria-labelledby="prova-title" className="surface-navy section-y">
           <div className="container-x">
-            <h2 id="prova-title" className="t-h2">O que dá para mostrar</h2>
-            <p className="t-lead mt-4 max-w-2xl">O número de projetos e a experiência do fundador. Depoimentos de clientes da agência ainda não estão publicados aqui.</p>
-            <p className="mt-10 font-display text-6xl font-extrabold tabular text-accent">+164</p>
-            <p className="mt-1 font-display text-xl font-bold text-white">projetos</p>
-            <div className="mt-12 max-w-3xl rounded-[var(--radius-block)] border border-line bg-white/5 p-6 sm:p-8">
-              <h3 className="font-display text-xl font-bold text-white">Experiência do fundador</h3>
-              <p className="mt-3 text-sm text-white">
-                Alex Marques, fundador da Mavox. As marcas abaixo fazem parte da experiência do fundador. Elas não são clientes da Mavox.
-              </p>
-              <ul className="mt-5 flex flex-wrap gap-2">
-                {founderBrands.map((brand) => (
-                  <li key={brand} className="rounded-full border border-line px-3 py-1.5 text-sm font-medium text-white">{brand}</li>
-                ))}
-              </ul>
-            </div>
+            <h2 id="prova-title" className="t-h2">Experiência do fundador</h2>
+            <p className="t-lead mt-4 max-w-3xl text-white">{founderSentence()}</p>
           </div>
         </section>
 

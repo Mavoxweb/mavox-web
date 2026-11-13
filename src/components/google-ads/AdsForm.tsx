@@ -148,7 +148,7 @@ export function AdsForm() {
           {err("name")}
         </label>
         <label className="block text-sm font-medium text-paper-ink">WhatsApp
-          <input name="phone" type="tel" inputMode="tel" autoComplete="tel-national" value={values.phone} aria-invalid={!!errors.phone} aria-describedby={errors.phone ? "phone-error" : undefined} onChange={(e) => setValues((current) => ({ ...current, phone: maskPhone(e.target.value) }))} className={field} placeholder="(21) 99999-9999" />
+          <input name="phone" type="tel" inputMode="tel" autoComplete="tel-national" value={values.phone} aria-invalid={!!errors.phone} aria-describedby={errors.phone ? "phone-error" : undefined} onChange={(e) => setValues((current) => ({ ...current, phone: maskPhone(e.target.value) }))} className={field} placeholder="(DDD) 99999-9999" />
           {err("phone")}
         </label>
         <label className="block text-sm font-medium text-paper-ink">Empresa

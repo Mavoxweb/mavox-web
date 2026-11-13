@@ -128,7 +128,6 @@ const jsonLdGraph = {
       email: SITE.emails[0],
       priceRange: "$$",
       currenciesAccepted: "BRL",
-      paymentAccepted: "Pix, Cartão de Crédito, Boleto Bancário",
       openingHoursSpecification: [
         {
           "@type": "OpeningHoursSpecification",

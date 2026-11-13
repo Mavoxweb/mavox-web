@@ -23,11 +23,11 @@ export function Floating() {
     return () => ios.forEach((i) => i.disconnect());
   }, []);
 
-  const showBar = hasHero && heroGone && !ctaVisible;
+  const showBar = campaign || (hasHero && heroGone && !ctaVisible);
 
   return (
     <div className={campaign ? "ads-brand" : undefined}>
-      <div className={`fixed right-4 z-40 transition-[opacity,transform,bottom] duration-300 ${ctaVisible ? "pointer-events-none translate-y-3 opacity-0" : "opacity-100"} ${showBar ? "bottom-[calc(5.25rem+env(safe-area-inset-bottom))]" : "bottom-[calc(1rem+env(safe-area-inset-bottom))]"} lg:bottom-6 lg:right-6`}>
+      <div className={`fixed right-4 z-40 transition-[opacity,transform,bottom] duration-300 ${campaign ? "max-lg:hidden" : ""} ${ctaVisible ? "pointer-events-none translate-y-3 opacity-0" : "opacity-100"} ${showBar ? "bottom-[calc(5.25rem+env(safe-area-inset-bottom))]" : "bottom-[calc(1rem+env(safe-area-inset-bottom))]"} lg:bottom-6 lg:right-6`}>
         <div className="group relative">
           <span className="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-lg bg-bg px-3 py-2 text-sm font-medium text-white opacity-0 shadow-float transition-opacity [@media(hover:hover)]:lg:block group-hover:opacity-100">Fale com a gente</span>
           <WhatsAppLink aria-label="Falar com a Mavox no WhatsApp" tabIndex={ctaVisible ? -1 : 0}
@@ -44,7 +44,9 @@ export function Floating() {
         className={`glass fixed inset-x-0 bottom-0 z-30 px-4 pt-3 transition-transform duration-300 lg:hidden ${showBar ? "translate-y-0" : "translate-y-full"}`}
         style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
         {campaign ? (
-          <a href="#formulario" tabIndex={showBar ? 0 : -1} className="btn btn-primary btn-block !min-h-12">Quero o combo por R$ 800</a>
+          <WhatsAppLink leadEvent={false} message={waMessage.floating} data-track-location="barra-mobile" tabIndex={showBar ? 0 : -1} className="btn btn-primary btn-block !min-h-12">
+            <MessageCircle className="h-5 w-5" aria-hidden /> Chamar no WhatsApp
+          </WhatsAppLink>
         ) : (
           <Link href="/orcamento" tabIndex={showBar ? 0 : -1} className="btn btn-primary btn-block !min-h-12">Pedir orçamento grátis</Link>
         )}

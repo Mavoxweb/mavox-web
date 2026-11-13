@@ -28,8 +28,14 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("landing de Google Ads: noindex, prova social e links", async ({ page }) => {
-  const response = await page.goto("/google-ads");
+  const pixelLogs: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/api/painel/pixels/log")) pixelLogs.push(request.url());
+  });
+  const response = await page.goto("/google-ads", { waitUntil: "networkidle" });
   expect(response?.ok()).toBeTruthy();
+  expect(pixelLogs).toEqual([]);
+  await page.addStyleTag({ content: "main > section { content-visibility: visible !important; }" });
 
   const html = await page.content();
   const visible = await page.locator("body").innerText();
@@ -38,11 +44,18 @@ test("landing de Google Ads: noindex, prova social e links", async ({ page }) =>
   expect(visible).not.toMatch(/4[,.]9/);
   expect(html).not.toContain("googletagmanager.com/gtm.js");
   expect(html).toContain("+164");
-  expect(html).toContain("Experiência do fundador");
-  expect(html).toContain("não são clientes da Mavox");
-  for (const brand of ["Reserva", "Domino's", "Mercedes", "Dalia", "Stone", "Amazon", "Americanas"]) {
-    expect(html).toContain(brand);
+  expect(visible).toContain("Experiência do fundador");
+  expect(visible).toContain("O fundador da Mavox tem +164 projetos entregues");
+  expect(visible).not.toMatch(/gestão/i);
+  expect(visible).not.toContain("não são clientes");
+  expect(visible).not.toContain("O que dá para mostrar");
+  expect(visible).toContain("Black November · até 30/11");
+  expect(visible).toContain("Pagamento no PIX");
+  expect(visible).toContain("Projetos que a Mavox entregou");
+  for (const brand of ["Reserva", "Domino's", "Mercedes", "Stone", "Amazon", "Americanas"]) {
+    expect(visible).toContain(brand);
   }
+  expect(visible).not.toContain("Dalia");
 
   const robots = await page.locator('meta[name="robots"]').first().getAttribute("content");
   expect(robots).toMatch(/noindex/i);
@@ -60,12 +73,37 @@ test("landing de Google Ads: noindex, prova social e links", async ({ page }) =>
   expect(robotsTxt.ok()).toBeTruthy();
   expect(await robotsTxt.text()).not.toContain("Disallow: /google-ads");
 
+  for (const url of [
+    "https://www.tgxengenharia.com.br/",
+    "https://selenita-smart-e-commerce-ai.vercel.app/",
+    "https://scapesaude-institucional.vercel.app/",
+    "https://www.poupconsig.com.br/",
+    "https://lojasdalia.com.br/",
+    "https://www.geriatex.com.br/",
+    "https://ocafy.vercel.app/",
+  ]) {
+    await expect(page.locator(`a[href="${url}"]`)).toHaveCount(1);
+  }
   const whatsapp = page.locator("a[href*='wa.me']");
   expect(await whatsapp.count()).toBeGreaterThan(0);
   const hrefs = await whatsapp.evaluateAll((links) => links.map((link) => link.getAttribute("href") ?? ""));
   for (const href of hrefs) expect(href).toContain("5521992855872");
 
-  await page.addStyleTag({ content: "main > section { content-visibility: visible !important; }" });
+  const shots = page.locator("main img");
+  const shotCount = await shots.count();
+  for (let i = 0; i < shotCount; i++) {
+    const shot = shots.nth(i);
+    await shot.scrollIntoViewIfNeeded();
+    await shot.evaluate((img: HTMLImageElement) => {
+      if (img.complete && img.naturalWidth > 0) return;
+      return new Promise<void>((resolve) => {
+        img.addEventListener("load", () => resolve(), { once: true });
+        img.addEventListener("error", () => resolve(), { once: true });
+      });
+    });
+  }
+  await page.evaluate(() => window.scrollTo(0, 0));
+
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: "/opt/cursor/artifacts/google-ads-390.png", fullPage: true });
   await page.setViewportSize({ width: 1280, height: 800 });
