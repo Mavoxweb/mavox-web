@@ -44,33 +44,37 @@ export function PortfolioCases() {
         <ul className="mt-10 grid gap-8 lg:grid-cols-2">
           {portfolioCases.map((item) => {
             const phoneOnly = !item.desktop && item.mobile;
+            const smallerPhone = item.title === "Geriatex" || item.title === "Poupconsig";
+            const copy = (
+              <div className={phoneOnly ? "flex flex-1 flex-col justify-center" : undefined}>
+                <p className="text-xs font-bold uppercase tracking-widest text-[#0085C6]">{item.tag}</p>
+                <h3 className="t-h3 mt-1">{item.title}</h3>
+                <p className="mt-2 text-base">{item.summary}</p>
+                <a href={item.url} target="_blank" rel="noopener noreferrer" className="btn btn-outline-dark mt-4 self-start">
+                  {item.linkLabel}
+                  <span className="sr-only"> de {item.title}. Abre em uma nova aba.</span>
+                  <ArrowUpRight className="h-4 w-4" aria-hidden />
+                </a>
+              </div>
+            );
             return (
               <li key={item.url} className={phoneOnly ? "lg:col-span-2" : undefined}>
-                <article className="flex h-full flex-col overflow-hidden rounded-[var(--radius-card)] border border-paper-line bg-white p-4 shadow-card">
+                <article className={`overflow-hidden rounded-[var(--radius-card)] border border-paper-line bg-white p-4 shadow-card ${phoneOnly ? "flex flex-col gap-6 sm:flex-row sm:items-center" : "flex h-full flex-col"}`}>
                   {item.desktop ? (
                     <div className="relative">
                       <Browser shot={item.desktop} host={hostOf(item.url)} />
                       {item.mobile ? (
-                        <div className="absolute bottom-3 right-3 h-[68%] w-[30%] max-w-[8.5rem]">
+                        <div className={`absolute bottom-3 right-3 ${smallerPhone ? "h-[58%] w-[26%] max-w-[7.2rem]" : "h-[68%] w-[30%] max-w-[8.5rem]"}`}>
                           <PhoneShot shot={item.mobile} />
                         </div>
                       ) : null}
                     </div>
                   ) : item.mobile ? (
-                    <div className="mx-auto w-full max-w-[16rem]">
-                      <div className="relative mx-auto w-[11.5rem]" style={{ aspectRatio: `${item.mobile.width} / ${item.mobile.height}` }}>
-                        <PhoneShot shot={item.mobile} />
-                      </div>
+                    <div className="mx-auto w-[11.5rem] shrink-0 sm:mx-0" style={{ aspectRatio: `${item.mobile.width} / ${item.mobile.height}` }}>
+                      <PhoneShot shot={item.mobile} />
                     </div>
                   ) : null}
-                  <p className="mt-4 text-xs font-bold uppercase tracking-widest text-[#0085C6]">{item.tag}</p>
-                  <h3 className="t-h3 mt-1">{item.title}</h3>
-                  <p className="mt-2 text-base">{item.summary}</p>
-                  <a href={item.url} target="_blank" rel="noopener noreferrer" className="btn btn-outline-dark mt-4 self-start">
-                    {item.linkLabel}
-                    <span className="sr-only"> de {item.title}. Abre em uma nova aba.</span>
-                    <ArrowUpRight className="h-4 w-4" aria-hidden />
-                  </a>
+                  {phoneOnly ? copy : <div className="mt-4">{copy}</div>}
                 </article>
               </li>
             );

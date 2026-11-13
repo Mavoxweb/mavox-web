@@ -141,6 +141,13 @@ test("landing de Google Ads: noindex, prova social e links", async ({ page }) =>
   ]) {
     await page.setViewportSize(viewport);
     await phonesStayInside(page);
+    const ocafy = page.locator("article").filter({ has: page.getByRole("heading", { name: "Ocafy", exact: true }) });
+    const sideBySide = await ocafy.evaluate((article) => {
+      const phone = article.querySelector("[data-device=phone]")!.getBoundingClientRect();
+      const title = article.querySelector("h3")!.getBoundingClientRect();
+      return title.left >= phone.right - 8 && title.top < phone.bottom;
+    });
+    expect(sideBySide).toBe(viewport.width >= 640);
   }
 
   await page.setViewportSize({ width: 390, height: 844 });
