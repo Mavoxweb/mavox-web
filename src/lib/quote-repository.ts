@@ -87,8 +87,9 @@ function isUniqueViolation(err: unknown): boolean {
  * Grava o lead da LP /google-ads na tabela `clients`, que é a lista do painel
  * e a fonte de "leads recentes" do dashboard. A tabela `leads` exige e-mail
  * (NOT NULL) e esta LP não pede e-mail, então não abrimos orçamento nem
- * inventamos um endereço. WhatsApp repetido atualiza o cliente existente
- * (índice único em phone_e164).
+ * inventamos um endereço. WhatsApp repetido NÃO sobrescreve nome, empresa nem
+ * cidade do cliente existente (o formulário é público): só preenche campos
+ * vazios, anexa a nota e registra a origem (índice único em phone_e164).
  */
 export async function saveGoogleAdsLead(input: Omit<GoogleAdsLeadInput, "website">): Promise<{ id: string }> {
   const offer = offerById(input.offer);
@@ -113,11 +114,8 @@ export async function saveGoogleAdsLead(input: Omit<GoogleAdsLeadInput, "website
     if (!isUniqueViolation(err) || !phoneE164) throw err;
     const updated = await queryOne<{ id: string }>(
       `UPDATE clients SET
-         name = $1,
-         phone = $2,
-         company = $4,
-         city = $5,
-         source = 'google-ads',
+         company = COALESCE(NULLIF(btrim(company), ''), $4),
+         city = COALESCE(NULLIF(btrim(city), ''), $5),
          intent = CASE WHEN intent = 'pronto_para_contratar' THEN intent ELSE 'avaliando' END,
          notes = CASE
            WHEN notes IS NULL OR btrim(notes) = '' THEN $6
@@ -125,8 +123,7 @@ export async function saveGoogleAdsLead(input: Omit<GoogleAdsLeadInput, "website
          END,
          recommended_service = $7,
          offer_code = $8,
-         whatsapp_status = 'confirmado',
-         whatsapp_link = $9,
+         whatsapp_link = COALESCE(whatsapp_link, $9),
          sources = CASE
            WHEN sources @> '["google-ads"]'::jsonb THEN sources
            ELSE sources || '["google-ads"]'::jsonb
