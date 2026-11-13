@@ -40,7 +40,7 @@ export function PortfolioCases() {
   return (
     <section aria-labelledby="portfolio-title" className="surface-paper section-y">
       <div className="container-x">
-        <h2 id="portfolio-title" className="t-h2">Projetos que a Mavox entregou</h2>
+        <h2 id="portfolio-title">Projetos que a Mavox <span className="hl">entregou</span></h2>
         <ul className="mt-10 grid gap-8 lg:grid-cols-2">
           {portfolioCases.map((item) => {
             const phoneOnly = !item.desktop && item.mobile;

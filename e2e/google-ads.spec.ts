@@ -70,14 +70,14 @@ test("landing de Google Ads: noindex, prova social e links", async ({ page }) =>
   expect(visible).not.toMatch(/4[,.]9/);
   expect(html).not.toContain("googletagmanager.com/gtm.js");
   expect(html).toContain("+164");
-  expect(visible).toContain("Experiência do fundador");
+  expect(visible.toLowerCase()).toContain("experiência do fundador");
   expect(visible).toContain("O fundador da Mavox tem +164 projetos entregues");
   expect(visible).not.toMatch(/gestão/i);
   expect(visible).not.toContain("não são clientes");
   expect(visible).not.toContain("O que dá para mostrar");
   expect(visible).toContain("Black November · até 30/11");
   expect(visible).toContain("Pagamento no PIX");
-  expect(visible).toContain("Projetos que a Mavox entregou");
+  expect(visible.toLowerCase()).toContain("projetos que a mavox entregou");
   for (const brand of ["Reserva", "Domino's", "Mercedes", "Stone", "Amazon", "Americanas"]) {
     expect(visible).toContain(brand);
   }

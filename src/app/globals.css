@@ -41,30 +41,61 @@ p { text-wrap: pretty; }
 .surface-dark { --heading: var(--color-fg); color: var(--color-fg-muted); background: var(--color-bg); }
 .surface-navy { --heading: var(--color-fg); color: var(--color-fg-muted); background: var(--color-surface); }
 
-/* LP /google-ads: cores oficiais do manual. Gilroy não entra — a licença pede webfont da Fontspring e o kit só tem TTF de desktop. A página usa Sora e Roboto, já servidas pelo site. */
+/* LP /google-ads: estilo "pôster" — fundo escuro, tipografia condensada pesada, bordas duras e sombras sólidas.
+   Cores da marca Mavox (navy #1A1548, verde #4CB748, azul #0085C6). Fontes: Big Shoulders (títulos) e Bricolage Grotesque (texto). */
 .ads-brand {
-  --color-bg: #1a1548;
-  --color-surface: #1a1548;
+  --ads-ink: #0d0b1f;
+  --ads-cream: #f4eee4;
+  --color-bg: var(--ads-ink);
+  --color-surface: #15122e;
   --color-surface-2: #0085c6;
   --color-accent: #4cb748;
-  --color-accent-hover: #00977a;
-  --color-accent-ink: #1a1548;
-  --color-paper-ink: #1a1548;
-  --color-paper-line: rgb(26 21 72 / 0.14);
+  --color-accent-hover: #5fd05a;
+  --color-accent-ink: #1a5c24;
+  --color-paper: var(--ads-cream);
+  --color-paper-ink: var(--ads-ink);
+  --color-paper-muted: #3b3a4e;
+  --color-paper-line: var(--ads-ink);
+  --color-line: rgb(244 238 228 / .18);
+  --color-fg-muted: rgb(244 238 228 / .78);
+  --radius-card: .5rem;
+  --radius-block: .5rem;
+  --radius-input: .375rem;
+  --font-display: var(--font-bigs), Impact, "Arial Narrow", sans-serif;
+  --font-sans: var(--font-brico), system-ui, sans-serif;
+  font-family: var(--font-sans);
+  background: var(--ads-ink);
 }
-.ads-brand .btn-primary { box-shadow: 0 1px 0 rgb(255 255 255 / .35) inset, 0 8px 24px -8px rgb(76 183 72 / .55); }
-.ads-brand .glass { background: rgb(26 21 72 / .96); }
-.ads-hero {
-  --heading: #fff;
-  color: rgb(255 255 255 / 0.88);
-  background-color: #1a1548;
-  background-image: linear-gradient(145deg, #1a1548 0%, #0085c6 100%);
-}
-.ads-green {
-  --heading: #1a1548;
-  color: #1a1548;
-  background-image: linear-gradient(135deg, #4cb748 0%, #00977a 100%);
-}
+.ads-brand h1, .ads-brand h2 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; letter-spacing: 0; line-height: .95; }
+.ads-brand h1 { font-size: clamp(3rem, 1.4rem + 7vw, 6rem); }
+.ads-brand h2 { font-size: clamp(2.5rem, 1.5rem + 4.5vw, 4.75rem); }
+.ads-brand h3, .ads-brand summary { font-family: var(--font-sans); letter-spacing: -.01em; }
+.ads-brand h3 { font-weight: 800; }
+.ads-brand .t-lead { font-size: clamp(1.0625rem, 1rem + .35vw, 1.3rem); }
+.ads-brand .btn { border-radius: .375rem; text-transform: uppercase; letter-spacing: .02em; font-weight: 800; font-family: var(--font-display); font-size: 1.125rem; min-height: 3.25rem; }
+.ads-brand .btn-primary { background: var(--color-accent); color: var(--ads-ink); box-shadow: 4px 4px 0 var(--ads-ink); border: 2px solid var(--ads-ink); }
+.ads-brand .btn-primary:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ads-ink); }
+.ads-brand .btn-ghost { border: 2px solid var(--ads-cream); color: var(--ads-cream); }
+.ads-brand .btn-outline-dark { border: 2px solid var(--ads-ink); background: transparent; color: var(--ads-ink); }
+.ads-brand .btn-dark { background: var(--ads-ink); color: var(--ads-cream); }
+.ads-brand .shadow-card { box-shadow: 5px 5px 0 var(--ads-ink); border: 2px solid var(--ads-ink); }
+.ads-brand .shadow-lg, .ads-brand .shadow-float { box-shadow: 6px 6px 0 var(--color-accent); }
+.ads-brand .glass { background: var(--ads-ink); border-top: 3px solid var(--color-accent); }
+.ads-brand .surface-dark, .ads-brand .surface-navy { background: var(--ads-ink); }
+.ads-brand .surface-light { background: #fbf7f0; }
+.ads-brand main > section + section.surface-light, .ads-brand main > section + section.surface-paper { border-top: 3px solid var(--ads-ink); }
+.ads-brand .hl { background: var(--color-accent); color: var(--ads-ink); padding: 0 .15em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.ads-brand .hl-cream { background: var(--ads-cream); color: var(--ads-ink); padding: 0 .15em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.ads-brand .ads-tag { display: inline-block; background: var(--ads-ink); color: var(--color-accent); font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 1.25rem; padding: .15rem .6rem; transform: rotate(-2deg); border: 2px solid var(--color-accent); }
+.ads-hero { --heading: var(--ads-cream); color: rgb(244 238 228 / .85); background-color: var(--ads-ink); background-image: radial-gradient(60rem 30rem at 85% -10%, rgb(76 183 72 / .18), transparent 60%), radial-gradient(40rem 25rem at -10% 100%, rgb(0 133 198 / .16), transparent 60%); }
+.ads-green { --heading: var(--ads-ink); color: var(--ads-ink); background: var(--color-accent); }
+.ads-ticker { background: var(--color-accent); color: var(--ads-ink); overflow: hidden; border-bottom: 3px solid var(--ads-ink); }
+.ads-ticker-track { display: flex; width: max-content; gap: 2rem; padding: .55rem 0; animation: ads-marquee 32s linear infinite; font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 1.125rem; white-space: nowrap; }
+.ads-ticker-track span { display: inline-flex; align-items: center; gap: 2rem; }
+.ads-ticker-track b { background: var(--ads-ink); color: var(--color-accent); padding: 0 .6rem; transform: rotate(-1.5deg); }
+@keyframes ads-marquee { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .ads-ticker-track { animation: none; } }
+.ads-brand .ads-step { font-family: var(--font-display); font-weight: 900; font-size: 4rem; line-height: .8; color: var(--color-accent); -webkit-text-stroke: 2px var(--ads-ink); }
 .surface-light { --heading: var(--color-paper-ink); color: var(--color-paper-muted); background: #fff; }
 .surface-paper { --heading: var(--color-paper-ink); color: var(--color-paper-muted); background: var(--color-paper); }
 

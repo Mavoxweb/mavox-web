@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Big_Shoulders, Bricolage_Grotesque } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check, MapPin, MessageCircle, Phone, Search, Store } from "lucide-react";
@@ -8,6 +9,11 @@ import { PortfolioCases } from "@/components/google-ads/PortfolioCases";
 import { WhatsAppLink } from "@/components/WhatsAppLink";
 import { CAMPAIGN, faq, founderSentence, GOOGLE_ADS_PATH, offers, pains, steps, waMessage } from "@/data/google-ads";
 import { SITE } from "@/lib/site";
+
+const bigShoulders = Big_Shoulders({ subsets: ["latin"], variable: "--font-bigs", weight: ["800", "900"], display: "swap" });
+const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-brico", weight: ["400", "500", "700", "800"], display: "swap" });
+
+const tickerItems = [CAMPAIGN.deadlineLabel, CAMPAIGN.paymentLabel, "Site no ar", "Anúncios no Google", "Atendimento no WhatsApp"] as const;
 
 const title = "Seu negócio aparecendo no Google: site + anúncios por R$ 800";
 const description = "Site profissional e configuração da campanha no Google Ads por R$ 800 até 30/11. Só o site por R$ 499. Configuração da campanha por R$ 950. Pagamento no PIX.";
@@ -51,8 +57,18 @@ const painIcons = [Store, Search, Phone] as const;
 
 export default function GoogleAdsLandingPage() {
   return (
-    <div className="ads-brand">
-      <header className="surface-dark border-b border-line">
+    <div className={`ads-brand ${bigShoulders.variable} ${bricolage.variable}`}>
+      <div className="ads-ticker" aria-hidden>
+        <div className="ads-ticker-track">
+          {[0, 1].map((copy) => (
+            <span key={copy}>
+              {tickerItems.map((item, i) => (i === 0 ? <b key={item}>{item}</b> : <span key={item}>✱ {item}</span>))}
+              <span>✱</span>
+            </span>
+          ))}
+        </div>
+      </div>
+      <header className="surface-dark border-b-2 border-line">
         <div className="container-x flex h-[4.5rem] items-center justify-between gap-4">
           <Link href="/" aria-label="Mavox, página inicial" className="rounded-lg">
             <Image
@@ -75,15 +91,18 @@ export default function GoogleAdsLandingPage() {
         <section id="hero" className="ads-hero">
           <div className="container-x grid items-center gap-10 py-12 lg:grid-cols-[1.15fr_.85fr] lg:py-20">
             <div>
-              <p className="inline-flex items-center gap-2 rounded-full border border-line bg-white/5 px-3.5 py-1.5 text-base font-medium text-white">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden /> {CAMPAIGN.deadlineLabel}
+              <p className="ads-tag">{CAMPAIGN.deadlineLabel}</p>
+              <p className="mt-6 text-base text-white">
+                <s className="opacity-60">Esperar indicação</s> <span className="font-bold text-accent">Ser encontrado no Google</span>
               </p>
-              <h1 className="t-h1 mt-5 text-white">Seu negócio aparecendo no Google: site + anúncios por R$ 800</h1>
-              <p className="t-lead mt-5 max-w-xl">
+              <h1 className="mt-3 text-white">
+                Seu negócio aparecendo no Google: site + anúncios por <span className="hl">R$ 800</span>
+              </h1>
+              <p className="t-lead mt-6 max-w-xl">
                 Site profissional e a configuração da campanha de pesquisa no Google. A oferta de entrada é o combo por <strong className="font-bold text-white">R$ 800</strong>.
               </p>
               <p className="mt-6 text-base text-white">De <s>R$ 1.500</s></p>
-              <p className="font-display text-5xl font-extrabold tabular text-accent sm:text-6xl">R$ 800</p>
+              <p className="font-display text-6xl font-black tabular text-accent sm:text-7xl">R$ 800</p>
               <p className="mt-1 text-base text-white">Site profissional + configuração da campanha no Google Ads</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <WhatsAppLink id="hero-cta" leadEvent={false} message={waMessage.hero} data-track-location="hero" className="btn btn-primary">
@@ -101,17 +120,17 @@ export default function GoogleAdsLandingPage() {
           </div>
         </section>
 
-        <section aria-labelledby="dores-title" className="surface-paper section-y">
+        <section aria-labelledby="dores-title" className="surface-dark section-y">
           <div className="container-x">
-            <h2 id="dores-title" className="t-h2 max-w-3xl">O cliente novo não pode depender de sorte</h2>
+            <h2 id="dores-title" className="max-w-4xl">O cliente novo não pode depender de <span className="hl">sorte</span></h2>
             <div className="mt-10 grid gap-4 md:grid-cols-3">
               {pains.map((pain, index) => {
                 const Icon = painIcons[index];
                 return (
-                  <article key={pain.title} className="rounded-[var(--radius-card)] border border-paper-line bg-white p-6 shadow-card">
-                    <span className="grid h-11 w-11 place-items-center rounded-xl bg-[#4CB748]/15 text-[#1A1548]"><Icon className="h-5 w-5" aria-hidden /></span>
-                    <h3 className="t-h3 mt-5">{pain.title}</h3>
-                    <p className="mt-2">{pain.text}</p>
+                  <article key={pain.title} className="rounded-[var(--radius-card)] border-2 border-accent bg-surface p-6 shadow-[5px_5px_0_var(--color-accent)]">
+                    <span className="grid h-11 w-11 place-items-center rounded-md bg-accent text-bg"><Icon className="h-5 w-5" aria-hidden /></span>
+                    <h3 className="t-h3 mt-5 text-white">{pain.title}</h3>
+                    <p className="mt-2 text-fg-muted">{pain.text}</p>
                   </article>
                 );
               })}
@@ -121,11 +140,11 @@ export default function GoogleAdsLandingPage() {
 
         <section aria-labelledby="como-title" className="surface-light section-y">
           <div className="container-x">
-            <h2 id="como-title" className="t-h2 max-w-3xl">Como funciona</h2>
+            <h2 id="como-title" className="max-w-3xl">Como <span className="hl">funciona</span></h2>
             <ol className="mt-10 grid gap-6 md:grid-cols-3">
               {steps.map((step, index) => (
                 <li key={step.title} className="rounded-[var(--radius-card)] bg-white p-6 shadow-card">
-                  <span className="font-display text-base font-bold text-accent-ink">0{index + 1}</span>
+                  <span className="ads-step">0{index + 1}</span>
                   <h3 className="t-h3 mt-3">{step.title}</h3>
                   <p className="mt-2 text-[15px]">{step.text}</p>
                 </li>
@@ -136,16 +155,16 @@ export default function GoogleAdsLandingPage() {
 
         <section id="precos" aria-labelledby="precos-title" className="surface-light section-y">
           <div className="container-x">
-            <h2 id="precos-title" className="t-h2">Escolha como começar</h2>
+            <h2 id="precos-title">Escolha como <span className="hl">começar</span></h2>
             <p className="t-lead mt-4 max-w-2xl">Escolha o que o seu negócio precisa agora.</p>
             <div className="mt-10 grid gap-4 lg:grid-cols-3">
               {offers.map((offer) => (
-                <article key={offer.id} className={`flex flex-col overflow-hidden rounded-[var(--radius-block)] border bg-white shadow-card ${offer.featured ? "border-[#4CB748]" : "border-paper-line"}`}>
+                <article key={offer.id} className={`flex flex-col overflow-hidden rounded-[var(--radius-block)] border bg-white shadow-card ${offer.featured ? "border-[3px] border-bg shadow-[8px_8px_0_var(--color-accent)]" : "border-paper-line"}`}>
                   <div className={offer.featured ? "ads-green px-6 pb-5 pt-6" : "px-6 pt-6"}>
                     {offer.badge && <p className="text-xs font-bold uppercase tracking-widest">{offer.badge}</p>}
                     <h3 className="t-h3 mt-2">{offer.name}</h3>
                     {offer.compareAt && <p className="mt-4 text-base">De <s>{offer.compareAt}</s></p>}
-                    <p className={`font-display text-4xl font-extrabold tabular text-paper-ink ${offer.compareAt ? "" : "mt-4"}`}>{offer.price}</p>
+                    <p className={`font-display text-6xl font-black tabular text-paper-ink ${offer.compareAt ? "" : "mt-4"}`}>{offer.price}</p>
                     {offer.featured ? <p className="mt-2 text-base font-medium">{CAMPAIGN.comboReturns}</p> : null}
                   </div>
                   <div className="flex flex-1 flex-col px-6 pb-6">
@@ -170,16 +189,16 @@ export default function GoogleAdsLandingPage() {
 
         <PortfolioCases />
 
-        <section aria-labelledby="prova-title" className="surface-navy section-y">
+        <section aria-labelledby="prova-title" className="ads-green section-y">
           <div className="container-x">
-            <h2 id="prova-title" className="t-h2">Experiência do fundador</h2>
-            <p className="t-lead mt-4 max-w-3xl text-white">{founderSentence()}</p>
+            <h2 id="prova-title">Experiência do fundador</h2>
+            <p className="t-lead mt-5 max-w-3xl font-medium !text-bg">{founderSentence()}</p>
           </div>
         </section>
 
         <section aria-labelledby="faq-title" className="surface-paper section-y">
           <div className="container-x max-w-3xl">
-            <h2 id="faq-title" className="t-h2">Dúvidas da campanha</h2>
+            <h2 id="faq-title">Dúvidas da <span className="hl">campanha</span></h2>
             <div className="mt-8 divide-y divide-paper-line overflow-hidden rounded-[var(--radius-card)] border border-paper-line bg-white shadow-card">
               {faq.map((item) => (
                 <details key={item.q} className="group px-5 py-1 sm:px-7">
@@ -198,7 +217,7 @@ export default function GoogleAdsLandingPage() {
         <section id="formulario" aria-labelledby="form-title" className="surface-light section-y">
           <div className="container-x grid gap-10 lg:grid-cols-[.85fr_1.15fr] lg:items-start">
             <div>
-              <h2 id="form-title" className="t-h2">Fale com a Mavox</h2>
+              <h2 id="form-title">Fale com a <span className="hl">Mavox</span></h2>
               <p className="t-lead mt-4">Se preferir não preencher, o WhatsApp abre com a mensagem da oferta.</p>
               <WhatsAppLink leadEvent={false} message={waMessage.hero} data-track-location="formulario" className="btn btn-dark mt-6">
                 <MessageCircle className="h-5 w-5" aria-hidden /> Abrir WhatsApp
