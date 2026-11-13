@@ -10,6 +10,32 @@ function eventsNamed(layer: DataLayerEvent[], name: string) {
   return layer.filter((item) => item.event === name);
 }
 
+async function phonesStayInside(page: Page) {
+  const leaks = await page.evaluate(() => {
+    const boxes: { name: string; phone: DOMRect; host: DOMRect }[] = [];
+    document.querySelectorAll("[data-device=phone]").forEach((phone) => {
+      const host = phone.closest("article, figure");
+      if (!host) return;
+      boxes.push({
+        name: host.querySelector("h3")?.textContent || host.getAttribute("aria-label") || "mockup",
+        phone: phone.getBoundingClientRect(),
+        host: host.getBoundingClientRect(),
+      });
+    });
+    return boxes
+      .filter(({ phone, host }) =>
+        phone.width < 8 ||
+        phone.height < 8 ||
+        phone.top < host.top - 2 ||
+        phone.left < host.left - 2 ||
+        phone.right > host.right + 2 ||
+        phone.bottom > host.bottom + 2,
+      )
+      .map(({ name }) => name);
+  });
+  expect(leaks).toEqual([]);
+}
+
 async function blockOutbound(page: Page) {
   await page.addInitScript(() => {
     document.addEventListener("click", (event) => {
@@ -56,6 +82,11 @@ test("landing de Google Ads: noindex, prova social e links", async ({ page }) =>
     expect(visible).toContain(brand);
   }
   expect(visible).not.toContain("Dalia");
+
+  expect(visible).toContain("Escolha o que o seu negócio precisa agora.");
+  expect(visible).toContain("Combo site + Google Ads");
+  expect(visible).toContain("Por que o combo sai mais barato que só a configuração do Google Ads?");
+  expect(html).not.toContain("Proposta grátis em até 24h");
 
   const robots = await page.locator('meta[name="robots"]').first().getAttribute("content");
   expect(robots).toMatch(/noindex/i);
@@ -104,7 +135,25 @@ test("landing de Google Ads: noindex, prova social e links", async ({ page }) =>
   }
   await page.evaluate(() => window.scrollTo(0, 0));
 
+  for (const viewport of [
+    { width: 1280, height: 800 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await phonesStayInside(page);
+  }
+
   await page.setViewportSize({ width: 390, height: 844 });
+  const bar = page.locator("[data-mobile-bar]");
+  await expect(bar).toHaveAttribute("data-open", "false");
+  await page.locator("#hero-cta").evaluate((element) => {
+    const bottom = element.getBoundingClientRect().bottom;
+    window.scrollBy(0, bottom + 24);
+  });
+  await expect(bar).toHaveAttribute("data-open", "true");
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(bar).toHaveAttribute("data-open", "false");
+
   await page.screenshot({ path: "/opt/cursor/artifacts/google-ads-390.png", fullPage: true });
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.screenshot({ path: "/opt/cursor/artifacts/google-ads-1280.png", fullPage: true });

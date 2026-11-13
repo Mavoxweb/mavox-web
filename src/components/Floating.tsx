@@ -14,16 +14,36 @@ export function Floating() {
   const campaign = usePathname() === GOOGLE_ADS_PATH;
 
   useEffect(() => {
+    const ios: IntersectionObserver[] = [];
+    if (campaign) {
+      const cta = document.getElementById("hero-cta");
+      if (cta) {
+        const io = new IntersectionObserver(([entry]) => {
+          setHeroGone(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+        });
+        io.observe(cta);
+        ios.push(io);
+      }
+      return () => ios.forEach((observer) => observer.disconnect());
+    }
+
     const hero = document.getElementById("hero");
     const cta = document.getElementById("contato");
     setHasHero(!!hero);
-    const ios: IntersectionObserver[] = [];
-    if (hero) { const io = new IntersectionObserver(([e]) => setHeroGone(!e.isIntersecting && e.boundingClientRect.top < 0)); io.observe(hero); ios.push(io); }
-    if (cta) { const io = new IntersectionObserver(([e]) => setCtaVisible(e.isIntersecting), { threshold: 0.15 }); io.observe(cta); ios.push(io); }
-    return () => ios.forEach((i) => i.disconnect());
-  }, []);
+    if (hero) {
+      const io = new IntersectionObserver(([entry]) => setHeroGone(!entry.isIntersecting && entry.boundingClientRect.top < 0));
+      io.observe(hero);
+      ios.push(io);
+    }
+    if (cta) {
+      const io = new IntersectionObserver(([entry]) => setCtaVisible(entry.isIntersecting), { threshold: 0.15 });
+      io.observe(cta);
+      ios.push(io);
+    }
+    return () => ios.forEach((observer) => observer.disconnect());
+  }, [campaign]);
 
-  const showBar = campaign || (hasHero && heroGone && !ctaVisible);
+  const showBar = campaign ? heroGone : hasHero && heroGone && !ctaVisible;
 
   return (
     <div className={campaign ? "ads-brand" : undefined}>
@@ -34,13 +54,13 @@ export function Floating() {
             leadEvent={!campaign}
             message={campaign ? waMessage.floating : undefined}
             data-track-location="flutuante"
-            className="grid h-14 w-14 place-items-center rounded-full bg-[#25d366] text-bg shadow-float transition-transform active:scale-95 [animation:pulse-ring_2.4s_infinite] motion-reduce:animate-none">
+            className={`grid h-14 w-14 place-items-center rounded-full shadow-float transition-transform active:scale-95 [animation:pulse-ring_2.4s_infinite] motion-reduce:animate-none ${campaign ? "bg-[#4CB748] text-[#1A1548]" : "bg-[#25d366] text-bg"}`}>
             <MessageCircle className="h-7 w-7" aria-hidden />
           </WhatsAppLink>
         </div>
       </div>
 
-      <div aria-hidden={!showBar}
+      <div data-mobile-bar data-open={showBar ? "true" : "false"} aria-hidden={!showBar}
         className={`glass fixed inset-x-0 bottom-0 z-30 px-4 pt-3 transition-transform duration-300 lg:hidden ${showBar ? "translate-y-0" : "translate-y-full"}`}
         style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
         {campaign ? (

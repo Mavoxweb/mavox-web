@@ -30,6 +30,11 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
   },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 const faqLd = {
@@ -81,7 +86,7 @@ export default function GoogleAdsLandingPage() {
               <p className="font-display text-5xl font-extrabold tabular text-accent sm:text-6xl">R$ 800</p>
               <p className="mt-1 text-base text-white">Site profissional + configuração da campanha no Google Ads</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <WhatsAppLink leadEvent={false} message={waMessage.hero} data-track-location="hero" className="btn btn-primary">
+                <WhatsAppLink id="hero-cta" leadEvent={false} message={waMessage.hero} data-track-location="hero" className="btn btn-primary">
                   <MessageCircle className="h-5 w-5" aria-hidden /> Chamar no WhatsApp
                 </WhatsAppLink>
                 <a href="#formulario" className="btn btn-ghost">Enviar meus dados <ArrowRight className="h-5 w-5" aria-hidden /></a>
@@ -104,7 +109,7 @@ export default function GoogleAdsLandingPage() {
                 const Icon = painIcons[index];
                 return (
                   <article key={pain.title} className="rounded-[var(--radius-card)] border border-paper-line bg-white p-6 shadow-card">
-                    <span className="grid h-11 w-11 place-items-center rounded-xl bg-danger/10 text-danger"><Icon className="h-5 w-5" aria-hidden /></span>
+                    <span className="grid h-11 w-11 place-items-center rounded-xl bg-[#4CB748]/15 text-[#1A1548]"><Icon className="h-5 w-5" aria-hidden /></span>
                     <h3 className="t-h3 mt-5">{pain.title}</h3>
                     <p className="mt-2">{pain.text}</p>
                   </article>
@@ -132,7 +137,7 @@ export default function GoogleAdsLandingPage() {
         <section id="precos" aria-labelledby="precos-title" className="surface-light section-y">
           <div className="container-x">
             <h2 id="precos-title" className="t-h2">Escolha como começar</h2>
-            <p className="t-lead mt-4 max-w-2xl">Os três preços são desta campanha. O combo é a oferta de entrada.</p>
+            <p className="t-lead mt-4 max-w-2xl">Escolha o que o seu negócio precisa agora.</p>
             <div className="mt-10 grid gap-4 lg:grid-cols-3">
               {offers.map((offer) => (
                 <article key={offer.id} className={`flex flex-col overflow-hidden rounded-[var(--radius-block)] border bg-white shadow-card ${offer.featured ? "border-[#4CB748]" : "border-paper-line"}`}>
@@ -144,7 +149,7 @@ export default function GoogleAdsLandingPage() {
                     {offer.featured ? <p className="mt-2 text-base font-medium">{CAMPAIGN.comboReturns}</p> : null}
                   </div>
                   <div className="flex flex-1 flex-col px-6 pb-6">
-                  <p className="mt-4 text-base">{offer.detail}</p>
+                  {offer.detail ? <p className="mt-4 text-base">{offer.detail}</p> : null}
                   <ul className="mt-5 space-y-2">
                     {offer.includes.map((item) => (
                       <li key={item} className="flex gap-2 text-base"><Check className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden />{item}</li>

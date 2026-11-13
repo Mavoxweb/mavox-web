@@ -31,13 +31,13 @@ export type Offer = {
 export const offers: readonly Offer[] = [
   {
     id: "combo",
-    name: "Site profissional + configuração da campanha no Google Ads",
+    name: "Combo site + Google Ads",
     price: "R$ 800",
     compareAt: "R$ 1.500",
-    detail: "Site profissional e a configuração da campanha de pesquisa no Google Ads.",
+    detail: "",
     includes: ["Site profissional", "Configuração da campanha no Google Ads"],
     code: "black-november-combo-800",
-    service: "Site profissional + configuração da campanha no Google Ads",
+    service: "Combo site + Google Ads",
     featured: true,
     badge: CAMPAIGN.deadlineLabel,
   },
@@ -107,7 +107,7 @@ export const faq = [
     a: "Não. Os preços desta página são o serviço da Mavox. A verba dos anúncios é paga direto ao Google.",
   },
   {
-    q: "Por que o combo sai mais barato que só o Ads?",
+    q: "Por que o combo sai mais barato que só a configuração do Google Ads?",
     a: `Até 30/11, o combo reúne o site profissional e a configuração da campanha por R$ 800. A configuração da campanha sozinha é R$ 950. ${CAMPAIGN.comboReturns}.`,
   },
   {
