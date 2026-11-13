@@ -24,6 +24,7 @@ const roboto = Roboto({
 const title = "Mavox | Criação de Sites, Lojas Virtuais e Tráfego Pago no Rio de Janeiro";
 const description =
   "Agência de tecnologia e marketing digital no Rio de Janeiro (Copacabana). Especialistas em sites institucionais, landing pages de alta conversão, e-commerce e tráfego pago (Google Ads e Meta Ads). Proposta grátis em até 24h.";
+const schemaDescription = description.replace(/\s*Proposta grátis em até 24h\.?/, "").trim();
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -128,7 +129,6 @@ const jsonLdGraph = {
       email: SITE.emails[0],
       priceRange: "$$",
       currenciesAccepted: "BRL",
-      paymentAccepted: "Pix, Cartão de Crédito, Boleto Bancário",
       openingHoursSpecification: [
         {
           "@type": "OpeningHoursSpecification",
@@ -161,13 +161,6 @@ const jsonLdGraph = {
           name: "Brasil",
         },
       ],
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.9",
-        reviewCount: "48",
-        bestRating: "5",
-        worstRating: "1",
-      },
       sameAs: SITE.socials.map((s) => s.href),
       hasOfferCatalog: {
         "@type": "OfferCatalog",
@@ -213,7 +206,7 @@ const jsonLdGraph = {
       "@id": `${SITE.url}/#website`,
       url: SITE.url,
       name: "Mavox",
-      description,
+      description: schemaDescription,
       publisher: {
         "@id": `${SITE.url}/#organization`,
       },
